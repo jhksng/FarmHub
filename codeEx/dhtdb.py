@@ -8,7 +8,7 @@ def connect_db():
     conn = mysql.connector.connect(
         host='localhost',
         user='root',
-        password='your_new_password',  # 변경된 MySQL root 비밀번호
+        password='1234',  # 변경된 MySQL root 비밀번호
         database='data'
     )
     return conn
@@ -37,11 +37,11 @@ def save_to_db(timestamp, humidity, temperature):
 def main():
     # 시리얼 연결 (아두이노와 연결된 포트 및 보드레이트 설정)
     ser = serial.Serial('/dev/ttyACM0', 9600, timeout=None)
-
     while True:
+        # ser = serial.Serial('/dev/ttyACM0', 9600, timeout=None)
         # 아두이노로부터 데이터 읽기
         line = ser.readline()  # 한 줄 읽기
-        arr = line.decode().split(' ')  # 공백 기준으로 나누기
+        arr = line.decode().strip().split(' ')  # 공백 기준으로 나누기
 
         # 유효한 데이터인지 확인 (빈 값이나 잘못된 값이 아니면 처리)
         if len(arr) != 2:
@@ -61,7 +61,7 @@ def main():
 
         # DB에 저장
         save_to_db(timestamp, humidity, temperature)
-
+        print(f"Saved to DB: Timestamp: {timestamp}, humidity: {humidity}, Temperature: {temperature}")
         # 10초 대기
         time.sleep(10)
 

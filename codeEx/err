@@ -9,3 +9,32 @@
     sure you have python3-full installed.
     
     For more information visit http://rptl.io/venv
+
+Traceback (most recent call last):
+  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 365, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+_mysql_connector.MySQLInterfaceError: Access denied for user 'root'@'localhost'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/pi/dhtdb.py", line 65, in <module>
+    main()
+  File "/home/pi/dhtdb.py", line 59, in main
+    save_to_db(timestamp, humidity, temperature)
+  File "/home/pi/dhtdb.py", line 19, in save_to_db
+    conn = connect_db()
+           ^^^^^^^^^^^^
+  File "/home/pi/dhtdb.py", line 8, in connect_db
+    conn = mysql.connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 153, in __init__
+    self.connect(**kwargs)
+  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1529, in connect
+    self._open_connection()
+  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 370, in _open_connection
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1698 (28000): Access denied for user 'root'@'localhost'

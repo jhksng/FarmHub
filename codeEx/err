@@ -11,24 +11,30 @@
     For more information visit http://rptl.io/venv
 
 Traceback (most recent call last):
-  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 755, in cmd_query
-    self._cmysql.query(
-_mysql_connector.MySQLInterfaceError: Incorrect double value: '' for column `data`.`SensorData`.`humidity` at row 1
+  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 365, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+_mysql_connector.MySQLInterfaceError: Access denied for user 'root'@'localhost' (using password: YES)
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/home/pi/dhtdb.py", line 65, in <module>
+  File "/home/pi/dhtdb.py", line 69, in <module>
     main()
-  File "/home/pi/dhtdb.py", line 59, in main
+  File "/home/pi/dhtdb.py", line 63, in main
     save_to_db(timestamp, humidity, temperature)
-  File "/home/pi/dhtdb.py", line 27, in save_to_db
-    cursor.execute(query, values)
-  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/cursor_cext.py", line 351, in execute
-    self._connection.cmd_query(
-  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 97, in wrapper
-    return method(cnx, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 763, in cmd_query
+  File "/home/pi/dhtdb.py", line 19, in save_to_db
+    conn = connect_db()
+           ^^^^^^^^^^^^
+  File "/home/pi/dhtdb.py", line 8, in connect_db
+    conn = mysql.connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 153, in __init__
+    self.connect(**kwargs)
+  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1529, in connect
+    self._open_connection()
+  File "/home/pi/myenv/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 370, in _open_connection
     raise get_mysql_exception(
-mysql.connector.errors.DataError: 1366 (22007): Incorrect double value: '' for column `data`.`SensorData`.`humidity` at row 1
+mysql.connector.errors.ProgrammingError: 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)

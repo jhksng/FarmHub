@@ -6,10 +6,10 @@ from datetime import datetime
 # MySQL/MariaDB 연결 함수
 def connect_db():
     conn = mysql.connector.connect(
-        host='localhost',  # MariaDB/MySQL 서버 호스트
-        user='root',       # 사용자 이름
-        password='root',  # 비밀번호
-        database='data'     # 사용할 데이터베이스
+        host='localhost',
+        user='root',
+        password='your_new_password',  # 변경된 MySQL root 비밀번호
+        database='data'
     )
     return conn
 
@@ -43,18 +43,23 @@ def main():
         line = ser.readline()  # 한 줄 읽기
         arr = line.decode().split(' ')  # 공백 기준으로 나누기
 
-        # 유효한 데이터인지 확인
+        # 유효한 데이터인지 확인 (빈 값이나 잘못된 값이 아니면 처리)
         if len(arr) != 2:
             continue
 
         # 습도와 온도 값 저장
-        humidity = arr[0]
-        temperature = arr[1].rstrip('\r\n')
+        try:
+            humidity = float(arr[0])  # 습도는 float로 변환
+            temperature = float(arr[1].rstrip('\r\n'))  # 온도는 float로 변환
+        except ValueError:
+            # 값이 float로 변환될 수 없으면 건너뜀
+            continue
 
         # 현재 시간 가져오기
         now = datetime.now()
         timestamp = now.strftime("%Y-%m-%d %H:%M:%S")  # YYYY-MM-DD HH:MM:SS 형식
-         # DB에 저장
+
+        # DB에 저장
         save_to_db(timestamp, humidity, temperature)
 
         # 10초 대기
@@ -62,4 +67,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

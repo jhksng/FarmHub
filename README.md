@@ -2,19 +2,9 @@
 
 <h2>팀 구성</h2>
 <ul>
-  <li>ddd</li>
-  <li>wwww</li>
+  <li>김정호</li>
+  <li>김한빈</li>
 </ul>
 
-<table>
-  <tr>
-    <td>조장</td>
-    <td>팀원</td>
-  </tr>
-  <tr>
-    <td><h3>김정호</h3></td>
-    <td><h3>김한빈</h3></td>
-  </tr>
-  
-</table>
+
 

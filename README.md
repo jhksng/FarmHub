@@ -32,6 +32,7 @@
 <ul>
   <li>RPi4 2gb</li>
   <li>RPi4 4gb</li>
+  <li>Arduino</li>
   
 </ul>
 

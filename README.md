@@ -16,7 +16,7 @@
 
 <h2>개발 환경</h2>
 <ul>
-  <li>Front-end : HTML, CSS</li>
+ <b><li>Front-end : HTML, CSS</li>
   <li>Back-end : Flask, Python</li>
   <li>Database : MariaDB </li>
   <li>협업 툴 : Discord, Github, Notion</li>

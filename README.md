@@ -8,8 +8,7 @@
     <td>김한빈</td>
   </tr>
   <tr>
-    <td></td>
-    <td></td>
+ 
   </tr>
 </table>
 

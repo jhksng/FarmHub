@@ -21,9 +21,9 @@
  <li>Front-end : HTML, CSS</li>
   <li>Back-end : Flask, Python</li>
   <li>Database : MariaDB </li>
-  <li>Tools : Discord, Github, Notion</li>
   <li>Design : Figma </li>
   <li>Operating system : Linux</li>
+  <li>Tools : Discord, Github, Notion</li>
 </ul>
 </b>
 

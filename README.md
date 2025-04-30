@@ -7,9 +7,7 @@
     <td>김정호</td>
     <td>김한빈</td>
   </tr>
-  <tr>
- 
-  </tr>
+
 </table>
 
 

@@ -1,6 +1,11 @@
 # 식물 자동 관리 시스템
 
 <h2>팀 구성</h2>
+<ul>
+  <li>ddd</li>
+  <li>wwww</li>
+</ul>
+
 <table>
   <tr>
     <td>조장</td>

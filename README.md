@@ -6,8 +6,8 @@
     <td>팀원</td>
   </tr>
   <tr>
-    <td>2</td>
-    <td>3</td>
+    <td><h3>김정호</h3></td>
+    <td><h3>김한빈</h3></td>
   </tr>
   
 </table>

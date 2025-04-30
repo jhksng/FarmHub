@@ -28,11 +28,12 @@
 </b>
 
 <h2>하드웨어 구조</h2>
-<b>사용 하드웨어</b>
+<b>하드웨어 1</b>
 <ul>
   <li>RPi4 2gb</li>
   <li>RPi4 4gb</li>
 </ul>
+<b>하드웨어 2</b>
 <ul>
   <li>Arduino</li>
 </ul>

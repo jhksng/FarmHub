@@ -2,8 +2,8 @@
 <h2>팀 구성</h2>
 <table>
   <tr>
-    <td>ddd</td>
-    <td>44</td>
+    <td>조장</td>
+    <td>팀원</td>
   </tr>
   <tr>
     <td>2</td>
@@ -11,4 +11,4 @@
   </tr>
   
 </table>
-김정호, 김한빈
+

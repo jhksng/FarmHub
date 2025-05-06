@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+  {% include "header.html" %}
+</head>
+<body>
+
+  <div class="container">
+    <h2>로그인</h2>
+    <form method="POST" action="/signin">
+      <input type="text" name="username" placeholder="name" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <button type="submit">Sign In</button>
+    </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <div style="color: red;">
+        {% for message in messages %}
+          <p>{{ message }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+  </div>
+  
+</body>
+</html>

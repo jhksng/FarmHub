@@ -1,0 +1,31 @@
+<!-- templates/confirm_crop.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>작물 선택 확인</title>
+  {% include "header.html" %}
+</head>
+<body>
+
+<h2>작물 선택 확인</h2>
+
+<p><strong>{{ crop.crop }}</strong>을(를) 선택하시겠습니까?</p>
+<ul>
+  <li>온도: {{ crop.temp }}℃</li>
+  <li>습도: {{ crop.humidity }}%</li>
+  <li>물 주는 주기: {{ crop.water }}</li>
+  <li>자라는 시간: {{ crop.growth }}일</li>
+</ul>
+
+<form method="POST" action="{{ url_for('select_crop') }}">
+  <input type="hidden" name="crop_name" value="{{ crop.crop }}">
+  <button type="submit">예</button>
+</form>
+
+<a href="{{ url_for('cropSelect') }}">
+  <button type="button">아니오</button>
+</a>
+
+</body>
+</html>

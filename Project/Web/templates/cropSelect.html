@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>작물 선택</title>
+  {% include "header.html" %}
+  <style>
+    .plant-box {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin: 10px;
+    }
+    .plant-box form {
+      display: inline-block;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>작물 선택</h2>
+
+<div class="plant-list">
+  {% for crop in crops %}
+    <div class="plant-box">
+      <div class="plant-name"><strong>{{ crop.crop }}</strong></div>
+      <div>온도: {{ crop.temp }}℃</div>
+      <div>습도: {{ crop.humidity }}%</div>
+      <div>물 주는 주기: {{ crop.water }}</div>
+      <div>자라는 시간: {{ crop.growth }}일</div>
+
+      <form action="{{ url_for('confirm_crop') }}" method="get">
+        <input type="hidden" name="crop" value="{{ crop.crop }}">
+        <a href="/confirm_crop?crop={{ crop.crop }}">선택</a>
+      </form>
+    </div>
+  {% endfor %}
+</div>
+
+</body>
+</html>

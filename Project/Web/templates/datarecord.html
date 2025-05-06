@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>데이터기록</title>
+</head>
+<body>
+
+    {% include 'header.html' %}
+
+    <h2>데이터 베이스 기록</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>기록 번호</th>
+                <th>작물</th>
+                <th>연</th>
+                <th>월</th>
+                <th>일</th>
+                <th>시/분/초</th>
+                <th>온도</th>
+                <th>습도</th>
+                <th>빛</th>
+                <th>성장률</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ record.crop }}</td>
+                <td>{{ record.year }}년</td>
+                <td>{{ record.month }}월</td>
+                <td>{{ record.day }}일</td>
+                <td>{{ record.time }}</td>
+                <td>{{ record.temp }}도</td>
+                <td>{{ record.humidity }}%</td>
+                <td>{{ record.light }}</td>
+                <td>{{ record.growth }}일</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

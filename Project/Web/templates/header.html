@@ -1,0 +1,34 @@
+<!-- templates/header.html -->
+<nav>
+    <div class="header" id="navbarNav">
+        <!-- 오른쪽 관리자, 유저확인-->
+        <ul class="left-header">
+            <li><h2>관리자</h2></li>
+        </ul>
+        <!-- 가운데 정렬된 내비게이션 메뉴 -->
+        <ul class="center-header">
+            <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('cropSelect') }}">작물선택</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('cropInfo') }}">작물상태, 제어</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="#">AI</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('data_record') }}">데이터기록</a>
+            </li>
+        </ul>
+
+        <!-- 오른쪽 로그인/알림 영역 -->
+        <ul class="right-header">
+            <li class="nav-item">
+            <a class="nav-link">알림</a></li>
+            <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('signin') }}">로그인</a></li>
+            <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('signup') }}">회원가입</a></li>
+        </ul>
+    </div>
+</nav>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>시스템 제어</title>
+  {% include "header.html" %}
+  <h2>시스템 상태</h2>
+</head>
+<body>
+  <section class="status-section">
+    <h3>{{ info.crop }}</h3>
+    <!-- 오른쪽: 제어 패널 -->
+    <div class="senser">
+      <div class="control-item">
+        <p>현재 온도: {{ record.temp }}℃ / 적정 온도: {{ info.temp }}℃</p>
+        <button>수동제어</button>
+        <button>자동제어</button>
+      </div>
+  
+      <div class="control-item">
+        <p>현재 습도: {{ record.humidity }}% / 적정 습도: {{ info.humidity }}%</p>
+        <button>수동제어</button>
+        <button>자동제어</button>
+      </div>
+  
+      <div class="control-item">
+        <p>빛 켜짐: 약 {{ record.light }}시간 동안</p>
+        <button>수동제어</button>
+        <button>자동제어</button>
+      </div>
+      <div class="control-item">
+        <p>{{ record.growth }}일 자람 / {{ info.growth }}일 남았음</p>
+        <button>수동제어</button>
+        <button>자동제어</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="status-section">
+    <h3>카메라</h3>
+    <div class="camera-view" style="width: 300px; height: 300px; background-color: #eee;">
+      [카메라 화면 영역]
+    </div>
+    <a href="#">크게보기</a>
+  </section>
+
+  
+  <section class="error-section">
+    <h3>오류창</h3>
+    <div class="error-log" style="height: 100px;  background-color: #eee;">[오류 내용 출력 영역]</div>
+  </section>
+
+</body>
+</html>

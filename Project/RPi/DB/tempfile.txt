@@ -1,0 +1,49 @@
+//데이터베이스에 데이터를 직접주고 웹에서 입출력하는 임시 데이터 파일 용도
+
+use smartparm;
+
+CREATE TABLE crop_info (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    crop varchar(20) not null,       -- 작물 이름
+    
+    temp float,             -- 온도 (예: 20)
+    humidity float,         -- 습도 (예: 48)
+    light INT,              -- 조도 (예: 32050)
+    water int,				-- 물 주는 주기(예: 8시간)
+    growth float          	-- 자라는데 걸리는 시간(예: 17일)
+);
+
+INSERT INTO crop_info (crop, temp, humidity, light, water, growth)
+VALUES ('상추',20, 48, 32050, 4, 6.7);
+INSERT INTO crop_info (crop, temp, humidity, light, water, growth)
+VALUES ('딸기',22, 46, 32020, 3, 7.7);
+
+CREATE TABLE crop_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    crop varchar(20) not null,     		-- 작물 이름
+    year int,              				-- 연도
+    month int,          				-- 월
+    day int,            				-- 일
+    time INT,               			-- HHMMSS 형식의 시간 (예: 235040)
+    temp float,             			-- 온도 (예: 20)
+    humidity float,         			-- 습도 (예: 48)
+    light INT,              			-- 조도 (예: 32050)
+    growth float           				-- 생장 수치 (예: 6.7)
+);
+
+INSERT INTO crop_logs (crop, year, month, day, time, temp, humidity, light, growth)
+VALUES ('상추', 2025, 5, 20, 235040, 20, 48, 32050, 6.7);
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(20) NOT NULL,
+    password VARCHAR(30) NOT NULL
+);
+
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS crop_logs;
+DROP TABLE IF EXISTS crop_info;
+
+select * from crop_info;
+select * from crop_logs;
+select * from users;

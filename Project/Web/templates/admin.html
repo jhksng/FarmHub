@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>관리자 페이지</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <style>
+    .admin-tabs {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .admin-tabs a {
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+    .admin-tabs a:hover {
+      background-color: #2980b9;
+    }
+    .admin-section {
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+    }
+    .admin-exit {
+      margin-left: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>관리자 페이지</h1>
+
+  <div class="admin-tabs">
+    <a href="{{ url_for('admin_dashboard') }}">데이터베이스</a>
+    <a href="{{ url_for('admin_control') }}">수동 제어</a>
+    <a href="{{ url_for('admin_add_crop') }}">작물 추가</a>
+    <a href="{{ url_for('home') }}" class="admin-exit">홈으로 돌아가기</a>
+  </div>
+
+  <div class="admin-section">
+    {{ content|safe }}
+  </div>
+</body>
+</html>

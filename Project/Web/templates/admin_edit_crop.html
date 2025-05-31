@@ -1,0 +1,18 @@
+<h2>작물 정보 편집</h2>
+<form method="POST" class="admin-form">
+    <label>작물 이름</label>
+    <input type="text" name="crop" value="{{ crop.crop }}" required>
+    <label>온도</label>
+    <input type="text" name="temp" value="{{ crop.temp }}" required>
+    <label>습도</label>
+    <input type="text" name="humidity" value="{{ crop.humidity }}" required>
+    <label>광량</label>
+    <input type="text" name="light" value="{{ crop.light }}" required>
+    <label>급수</label>
+    <input type="text" name="water" value="{{ crop.water }}" required>
+    <label>성장</label>
+    <input type="text" name="growth" value="{{ crop.growth }}" required>
+    <label>설명</label>
+    <textarea name="description">{{ crop.description }}</textarea>
+    <button type="submit" class="edit-btn">수정 완료</button>
+</form>

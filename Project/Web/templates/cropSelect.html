@@ -37,9 +37,9 @@
     <article class="plant-content">
       <div class="plant-image">
         {% if selected_info.image %}
-          <img src="{{ url_for('static', filename='images/' + selected_info.image) }}" alt="{{ selected_info.crop }} 이미지">
+          <img src="{{ url_for('static', filename='images/crop_images/' + selected_info.image) }}" alt="{{ selected_info.crop }} 이미지">
         {% else %}
-          <img src="{{ url_for('static', filename='images/default.jpg') }}" alt="기본 작물 이미지">
+          <img src="{{ url_for('static', filename='images/crop_images/default.jpg') }}" alt="기본 작물 이미지">
         {% endif %}
       </div>
       <div class="plant-details">

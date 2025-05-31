@@ -1,0 +1,22 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_control.css') }}">
+<div class="manual-control-box">
+  <h2>수동 제어</h2>
+  <form method="post">
+    <div class="control-row">
+      <button name="device" value="water_pump_on">💧 워터펌프 ON</button>
+      <button name="device" value="water_pump_off">💧 워터펌프 OFF</button>
+    </div>
+    <div class="control-row">
+      <button name="device" value="heat_lamp_on">🔥 열전구 ON</button>
+      <button name="device" value="heat_lamp_off">🔥 열전구 OFF</button>
+    </div>
+    <div class="control-row">
+      <button name="device" value="fan_on">🌬️ 팬 ON</button>
+      <button name="device" value="fan_off">🌬️ 팬 OFF</button>
+    </div>
+    <div class="control-row">
+      <button name="device" value="led_on">💡 LED ON</button>
+      <button name="device" value="led_off">💡 LED OFF</button>
+    </div>
+  </form>
+</div>

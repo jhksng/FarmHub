@@ -1,0 +1,31 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_form.css') }}">
+<div class="crop-add-box">
+  <h2>작물 정보 추가</h2>
+  <form method="post" enctype="multipart/form-data">
+    <label>작물 이름:
+      <input type="text" name="crop" required>
+    </label>
+    <label>온도(℃):
+      <input type="number" name="temp" required>
+    </label>
+    <label>습도(%):
+      <input type="number" name="humidity" required>
+    </label>
+    <label>빛 주기(시간):
+      <input type="number" name="light" required>
+    </label>
+    <label>물 주기(일):
+      <input type="number" name="water" required>
+    </label>
+    <label>성장 기간(일):
+      <input type="number" name="growth" required>
+    </label>
+    <label>설명:
+      <textarea name="description" rows="4"></textarea>
+    </label>
+    <label>이미지:
+      <input type="file" name="image">
+    </label>
+    <button type="submit">작물 추가</button>
+  </form>
+</div>

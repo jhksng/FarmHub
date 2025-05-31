@@ -13,39 +13,23 @@
       <h2>{{ info.crop }}</h2>
 
       <div class="control-item">
-        <img src="{{ url_for('static', filename='images/temp.png') }}" alt="온도" class="icon">
+        <img src="{{ url_for('static', filename='images/icon_images/temp.png') }}" alt="온도" class="icon">
         <p>현재 {{ record.temp }}℃ / 적정 온도 {{ info.temp }}℃</p>
-        <div class="button-group">
-          <button>수동제어</button>
-          <button>자동제어</button>
-        </div>
       </div>
 
       <div class="control-item">
-        <img src="{{ url_for('static', filename='images/humidity.png') }}" alt="습도" class="icon">
+        <img src="{{ url_for('static', filename='images/icon_images/humidity.png') }}" alt="습도" class="icon">
         <p>현재 습도 {{ record.humidity }}% / 적정 습도 {{ info.humidity }}%</p>
-        <div class="button-group">
-          <button>수동제어</button>
-          <button>자동제어</button>
-        </div>
       </div>
 
       <div class="control-item">
-        <img src="{{ url_for('static', filename='images/light.png') }}" alt="조명" class="icon">
+        <img src="{{ url_for('static', filename='images/icon_images/light.png') }}" alt="조명" class="icon">
         <p>빛 켜짐: 약 {{ record.light }}시간 동안</p>
-        <div class="button-group">
-          <button>수동제어</button>
-          <button>자동제어</button>
-        </div>
       </div>
 
       <div class="control-item">
-        <img src="{{ url_for('static', filename='images/growth.png') }}" alt="성장" class="icon">
+        <img src="{{ url_for('static', filename='images/icon_images/growth.png') }}" alt="성장" class="icon">
         <p>{{ record.growth }}일 자람 / {{ info.growth }}일 남았음</p>
-        <div class="button-group">
-          <button>수동제어</button>
-          <button>자동제어</button>
-        </div>
       </div>
     </section>
 

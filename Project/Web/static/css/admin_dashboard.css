@@ -1,8 +1,13 @@
+/* 관리자 대시보드 테이블 스타일 */
 .admin-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 30px;
   font-size: 0.95rem;
+  background-color: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .admin-table th,
@@ -15,6 +20,7 @@
 .admin-table th {
   background-color: #2c3e50;
   color: white;
+  font-weight: 600;
 }
 
 .admin-table tr:nth-child(even) {
@@ -25,6 +31,7 @@
   background-color: #f1f1f1;
 }
 
+/* 편집 및 삭제 버튼 */
 .edit-btn,
 .delete-btn {
   padding: 6px 12px;
@@ -54,10 +61,16 @@
   background-color: #c0392b;
 }
 
+/* 제목 스타일 */
 h2 {
   font-size: 1.4rem;
   margin: 30px 0 15px;
   color: #2c3e50;
   border-bottom: 2px solid #ccc;
   padding-bottom: 5px;
+}
+
+/* 섹션 구분 */
+.dashboard-section {
+  margin-bottom: 50px;
 }

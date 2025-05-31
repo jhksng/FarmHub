@@ -1,12 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>home</title>
+    <title>홈 | 스마트팜 시스템</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
     {% include "header.html" %}
 </head>
 <body>
-    <h1>환영합니다!!</h1>
+    <div class="home-container">
+        <div class="overlay">
+            <h1 class="welcome-text">스마트팜에 오신 것을 환영합니다!</h1>
+            <p class="sub-text">작물을 선택하고, 상태를 확인하며 스마트하게 관리해보세요.</p>
+        </div>
+    </div>
 </body>
 </html>

@@ -1,6 +1,55 @@
-/* static/css/admin.css */
+/* 공통 레이아웃 */
+.admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.admin-title {
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 30px;
+    color: #2c3e50;
+}
+
+/* 탭 내비게이션 */
+.admin-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.admin-tabs a {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.admin-tabs a:hover {
+    background-color: #2980b9;
+}
+
+.admin-exit {
+    margin-left: auto;
+}
+
+/* 콘텐츠 영역 */
+.admin-section {
+    background-color: #f9f9f9;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* 테이블 스타일 */
 .record-table-container {
-    margin-top: 30px;
+    margin-top: 20px;
     background-color: #fff;
     padding: 20px;
     border-radius: 10px;
@@ -10,6 +59,7 @@
 .record-table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 10px;
 }
 
 .record-table thead {
@@ -26,4 +76,12 @@
 
 .record-table tr:hover {
     background-color: #f2f2f2;
+}
+
+/* 반응형 (선택 사항) */
+@media (max-width: 768px) {
+    .admin-tabs {
+        flex-direction: column;
+        align-items: center;
+    }
 }

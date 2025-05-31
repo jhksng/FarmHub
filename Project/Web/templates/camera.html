@@ -2,20 +2,26 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>카메라</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/camera.css') }}">
+  <title>카메라 스트리밍</title>
   {% include "header.html" %}
+  <style>
+    .camera-box {
+      max-width: 800px;
+      margin: 40px auto;
+      text-align: center;
+    }
+    .camera-box img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+  </style>
 </head>
 <body>
-  <main class="camera-container">
-    <h2>카메라</h2>
-    <section class="camera-section">
-      <div class="camera-view">
-        [카메라 화면 영역]
-      </div>
-    </section>
-  </main>
+  <div class="camera-box">
+    <h2>실시간 카메라</h2>
+
+    {# <img src="{{ url_for('camera.video_feed') }}" alt="Camera Stream"> #}
+  </div>
 </body>
 </html>

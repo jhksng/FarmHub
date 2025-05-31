@@ -1,65 +1,59 @@
 .crop-add-box {
   max-width: 600px;
   margin: 40px auto;
-  background-color: #ffffff;
+  background: #fff;
+  padding: 30px;
   border-radius: 12px;
-  padding: 30px 40px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .crop-add-box h2 {
   text-align: center;
   color: #2c3e50;
-  font-size: 24px;
   margin-bottom: 25px;
 }
 
-.crop-add-box label {
-  display: block;
-  margin-bottom: 15px;
-  font-weight: 600;
-  color: #333;
-  font-size: 15px;
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.crop-add-box input[type="text"],
-.crop-add-box input[type="number"],
-.crop-add-box input[type="file"],
-.crop-add-box textarea {
-  width: 100%;
-  padding: 10px 12px;
-  font-size: 15px;
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #34495e;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 10px;
+  font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  margin-top: 6px;
-  box-sizing: border-box;
-  transition: border-color 0.2s ease;
 }
 
-.crop-add-box input:focus,
-.crop-add-box textarea:focus {
-  border-color: #27ae60;
-  outline: none;
+.form-buttons {
+  text-align: center;
+  margin-top: 20px;
 }
 
-.crop-add-box textarea {
-  resize: vertical;
-}
-
-.crop-add-box button[type="submit"] {
-  margin-top: 25px;
-  width: 100%;
-  background-color: #3498db;
+.submit-btn {
+  background-color: #27ae60;
   color: white;
+  padding: 12px 25px;
   font-size: 16px;
-  padding: 12px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
+  transition: background 0.3s ease;
 }
 
-.crop-add-box button[type="submit"]:hover {
-  background-color: #2980b9;
-  transform: scale(1.03);
+.submit-btn:hover {
+  background-color: #219150;
 }

@@ -3,12 +3,12 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <nav>
     <div class="header" id="navbarNav">
-        <!-- 오른쪽 관리자, 유저확인-->
+        <!-- 왼쪽 관리자, 유저확인 -->
         <ul class="left-header">
             <li>
                 <h2>
                     {% if session.get('username') == 'admin' %}
-                        <a class="padmin" href="{{ url_for('admin_dashboard') }}">관리자</a>
+                        <a class="padmin" href="{{ url_for('admin.dashboard') }}">관리자</a>
                     {% elif session.get('username') %}
                         {{ session.get('username') }}
                     {% else %}
@@ -17,25 +17,26 @@
                 </h2>
             </li>
         </ul>
+
         <!-- 가운데 정렬된 내비게이션 메뉴 -->
         <ul class="center-header">
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('cropSelect') }}">작물선택</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('cropInfo') }}">작물상태</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('camera') }}">카메라</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('crop.crop_select') }}">작물선택</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('crop.crop_information') }}">작물상태</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('camera.camera_view') }}">카메라</a></li>
             <li class="nav-item"><a class="nav-link" href="#">AI</a></li>
         </ul>
 
         <!-- 오른쪽 로그인/알림 영역 -->
         <ul class="right-header">
-        <li class="nav-item dropdown">
-          <a class="nav-link" href="#"><i class="fas fa-cog"></i></a>
-          <ul class="dropdown-menu">
-            <li><a href="#">알림</a></li>
-            <li><a href="{{ url_for('logout') }}">로그아웃</a></li>
-          </ul>
-        </li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('signin') }}">로그인</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('signup') }}">회원가입</a></li>
+            <li class="nav-item dropdown">
+                <a class="nav-link" href="#"><i class="fas fa-cog"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">알림</a></li>
+                    <li><a href="{{ url_for('auth.logout') }}">로그아웃</a></li>
+                </ul>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.signin') }}">로그인</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.signup') }}">회원가입</a></li>
         </ul>
     </div>
 </nav>

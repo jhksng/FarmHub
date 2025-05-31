@@ -1,85 +1,92 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
-<h2>데이터 기록 (최근 50개)</h2>
-<table class="admin-table">
-    <thead>
-        <tr>
-            <th>작물</th>
-            <th>날짜</th>
-            <th>온도</th>
-            <th>습도</th>
-            <th>광량 시간</th>
-            <th>성장단계</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in records %}
-        <tr>
-            <td>{{ row.crop_name }}</td>
-            <td>{{ row.datetime }}</td>
-            <td>{{ row.temp }}</td>
-            <td>{{ row.humidity }}</td>
-            <td>{{ row.light_str }}</td>
-            <td>{{ row.growth }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
 
-<h2>사용자 목록</h2>
-<table class="admin-table">
+<section class="dashboard-section">
+  <h2>데이터 기록 (최근 50개)</h2>
+  <table class="admin-table">
     <thead>
-        <tr>
-            <th>아이디</th>
-            <th>이름</th>
-            <th>선택 작물</th>
-            <th>작업</th>
-        </tr>
+      <tr>
+        <th>작물</th>
+        <th>날짜</th>
+        <th>온도</th>
+        <th>습도</th>
+        <th>광량 시간</th>
+        <th>성장단계</th>
+      </tr>
     </thead>
     <tbody>
-        {% for user in users %}
-        <tr>
-            <td>{{ user.id }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.selected_crop }}</td>
-            <td>
-                <form action="{{ url_for('delete_user', user_id=user.id) }}" method="post" style="display:inline;">
-                    <button type="submit" class="delete-btn">삭제</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
+      {% for row in records %}
+      <tr>
+        <td>{{ row.crop_name }}</td>
+        <td>{{ row.datetime }}</td>
+        <td>{{ row.temp }}</td>
+        <td>{{ row.humidity }}</td>
+        <td>{{ row.light_str }}</td>
+        <td>{{ row.growth }}</td>
+      </tr>
+      {% endfor %}
     </tbody>
-</table>
+  </table>
+</section>
 
-<h2>등록된 작물</h2>
-<table class="admin-table">
+<section class="dashboard-section">
+  <h2>사용자 목록</h2>
+  <table class="admin-table">
     <thead>
-        <tr>
-            <th>이름</th>
-            <th>온도</th>
-            <th>습도</th>
-            <th>광량</th>
-            <th>급수</th>
-            <th>성장</th>
-            <th>작업</th>
-        </tr>
+      <tr>
+        <th>아이디</th>
+        <th>이름</th>
+        <th>선택 작물</th>
+        <th>작업</th>
+      </tr>
     </thead>
     <tbody>
-        {% for crop in crops %}
-        <tr>
-            <td>{{ crop.crop }}</td>
-            <td>{{ crop.temp }}</td>
-            <td>{{ crop.humidity }}</td>
-            <td>{{ crop.light }}</td>
-            <td>{{ crop.water }}</td>
-            <td>{{ crop.growth }}</td>
-            <td>
-                <a href="{{ url_for('edit_crop', crop_id=crop.id) }}" class="edit-btn">편집</a>
-                <form action="{{ url_for('delete_crop', crop_id=crop.id) }}" method="post" style="display:inline;">
-                    <button type="submit" class="delete-btn">삭제</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
+      {% for user in users %}
+      <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.selected_crop }}</td>
+        <td>
+          <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="delete-btn">삭제</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
     </tbody>
-</table>
+  </table>
+</section>
+
+<section class="dashboard-section">
+  <h2>등록된 작물</h2>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>이름</th>
+        <th>온도</th>
+        <th>습도</th>
+        <th>광량</th>
+        <th>급수</th>
+        <th>성장</th>
+        <th>작업</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for crop in crops %}
+      <tr>
+        <td>{{ crop.crop }}</td>
+        <td>{{ crop.temp }}</td>
+        <td>{{ crop.humidity }}</td>
+        <td>{{ crop.light }}</td>
+        <td>{{ crop.water }}</td>
+        <td>{{ crop.growth }}</td>
+        <td>
+          <a href="{{ url_for('admin.edit_crop', crop_id=crop.id) }}" class="edit-btn">편집</a>
+          <form action="{{ url_for('admin.delete_crop', crop_id=crop.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="delete-btn">삭제</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>

@@ -1,22 +1,28 @@
-<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_control.css') }}">
-<div class="manual-control-box">
-  <h2>수동 제어</h2>
-  <form method="post">
-    <div class="control-row">
-      <button name="device" value="water_pump_on">💧 워터펌프 ON</button>
-      <button name="device" value="water_pump_off">💧 워터펌프 OFF</button>
-    </div>
-    <div class="control-row">
-      <button name="device" value="heat_lamp_on">🔥 열전구 ON</button>
-      <button name="device" value="heat_lamp_off">🔥 열전구 OFF</button>
-    </div>
-    <div class="control-row">
-      <button name="device" value="fan_on">🌬️ 팬 ON</button>
-      <button name="device" value="fan_off">🌬️ 팬 OFF</button>
-    </div>
-    <div class="control-row">
-      <button name="device" value="led_on">💡 LED ON</button>
-      <button name="device" value="led_off">💡 LED OFF</button>
-    </div>
-  </form>
-</div>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>수동 제어</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_control.css') }}">
+</head>
+<body>
+  <div class="manual-control-box">
+    <h2>수동 제어</h2>
+    <form method="post" class="manual-control-form">
+      {% set controls = [
+        ('water_pump', '💧 워터펌프'),
+        ('heat_lamp', '🔥 열전구'),
+        ('fan', '🌬️ 팬'),
+        ('led', '💡 LED')
+      ] %}
+
+      {% for device, label in controls %}
+      <div class="control-row">
+        <button type="submit" name="device" value="{{ device }}_on">{{ label }} ON</button>
+        <button type="submit" name="device" value="{{ device }}_off">{{ label }} OFF</button>
+      </div>
+      {% endfor %}
+    </form>
+  </div>
+</body>
+</html>

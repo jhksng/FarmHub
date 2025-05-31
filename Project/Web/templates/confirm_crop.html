@@ -1,4 +1,3 @@
-<!-- templates/confirm_crop.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -18,18 +17,18 @@
   <ul>
     <li>필요한 온도: {{ crop.temp }}℃</li>
     <li>필요한 습도: {{ crop.humidity }}%</li>
-    <li>빛 주는 주기{{ crop.light }}</li>
+    <li>빛 주는 주기: {{ crop.light }}</li>
     <li>물 주는 주기: {{ crop.water }}</li>
     <li>다 자라는 시간: {{ crop.growth }}일</li>
   </ul>
 
   <div class="confirm-buttons">
-    <form method="POST" action="{{ url_for('select_crop') }}">
+    <form method="POST" action="{{ url_for('crop.select_crop') }}">
       <input type="hidden" name="crop_name" value="{{ crop.crop }}">
       <button type="submit">예</button>
     </form>
 
-    <a href="{{ url_for('cropSelect') }}">
+    <a href="{{ url_for('crop.crop_select') }}">
       <button type="button">아니오</button>
     </a>
   </div>

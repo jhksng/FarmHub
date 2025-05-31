@@ -1,0 +1,69 @@
+form {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+select {
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: white;
+  transition: box-shadow 0.3s ease;
+}
+
+select:hover,
+select:focus {
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.plant-box {
+  max-width: 700px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 20px 25px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.plant-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.plant-image img {
+  width: 150px;
+  height: 250px;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.plant-details {
+  flex-grow: 1;
+}
+
+.plant-name {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #27ae60;
+}
+
+.plant-details p {
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.plant-desc {
+  margin-top: 10px;
+  font-style: italic;
+  color: #555;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}

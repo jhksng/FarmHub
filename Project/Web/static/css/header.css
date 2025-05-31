@@ -1,0 +1,128 @@
+nav {
+  background-color: #2c3e50;
+  padding: 10px 20px;
+  color: white;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+ul.left-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #ecf0f1;
+}
+
+.padmin {
+  font-size: 1.5rem;
+  color: #ecf0f1;
+  text-decoration: none;
+}
+
+.padmin:hover {
+  color: #ecf0f1;
+  text-decoration: underline;
+}
+
+ul.center-header,
+ul.left-header,
+ul.right-header {
+  gap: 20px;
+}
+
+.nav-link {
+  color: #ecf0f1;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.2s, background-color 0.2s;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.nav-link:hover {
+  background-color: #34495e;
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  ul.center-header,
+  ul.right-header,
+  ul.left-header {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .nav-link {
+    display: block;
+    width: 100%;
+  }
+}
+
+/* 톱니바퀴가 포함된 nav-item 위치 기준 설정 */
+.nav-item.dropdown {
+  position: relative;
+}
+
+/* 드롭다운 메뉴 수정 */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  z-index: 1000;
+  border-radius: 4px;
+  min-width: 120px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 드롭다운 메뉴 항목 스타일 */
+.dropdown-menu li {
+  padding: 10px;
+}
+
+.dropdown-menu li a {
+  text-decoration: none;
+  color: #333;
+  display: block;
+  font-size: 0.95rem;
+}
+
+.dropdown-menu li:hover {
+  background-color: #f5f5f5;
+}
+
+/* 호버 시 드롭다운 표시 */
+.nav-item.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+/* 아이콘 간격 정리 */
+.nav-item.dropdown > a {
+  display: inline-block;
+  padding: 10px;
+  color: white;
+}

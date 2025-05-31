@@ -1,0 +1,72 @@
+body {
+  overflow: hidden; /* 스크롤 제거 */
+}
+
+/* 전체 컨테이너를 수직 정렬 */
+.info-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+/* 상태 패널 그리드 구성 */
+.status-panel {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  max-width: 1000px;
+  width: 100%;
+}
+
+/* 작물 이름 타이틀 */
+.status-panel h2 {
+  grid-column: span 2;
+  font-size: 28px;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* 센서 및 제어 항목 */
+.control-item {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 35px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.control-item p {
+  flex-grow: 1;
+  margin: 0;
+}
+
+.icon {
+  width: 40px;
+  height: 44px;
+}
+
+/* 오류창 아래 배치 */
+.error-panel {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.error-panel h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #e74c3c;
+}
+
+.error-log {
+  height: 140px;
+  background-color: #fcecec;
+  border: 1px solid #e0b4b4;
+  border-radius: 8px;
+  padding: 4px;
+  color: #c0392b;
+  overflow-y: auto;
+}

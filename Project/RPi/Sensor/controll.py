@@ -22,7 +22,7 @@ state = {
 
 @app.route('/control')
 def control_page():
-	return render_template('control.html', state=state)
+	return render_template('view_control.html', state=state)
 
 @app.route('/controller', methods=["POST"])
 def controller():

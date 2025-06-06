@@ -42,8 +42,8 @@ def controller():
 		state[13] = B
 	if 'WaterPump' in request.form:
 		w = int(request.form['WaterPump'])
-		GPIO.output(16, w)
-		state[16] = w
+		GPIO.output(19, w)
+		state[19] = w
 	if 'PTC' in request.form:
 		p = int(request.form['PTC'])
 		GPIO.output(26, p)

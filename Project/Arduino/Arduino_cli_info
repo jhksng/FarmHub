@@ -10,6 +10,20 @@ arduino-cli config dump
 
 [environment address]
 sudo nano ~/.arduino15/arduino-cli.yaml
+{
+directories:
+  data: /home/pi/.arduino15
+  downloads: /home/pi/.arduino15/staging
+  user: /home/pi/Arduino
+
+library:
+  enable_unsafe_install: false
+
+daemon:
+  port: "50051"
+}
+
+
 
 [arduino board definition file install]
 arduino-cli core install arduino:avr

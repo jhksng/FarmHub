@@ -26,7 +26,7 @@ try:
                 timestamp = datetime.now()
                 temp = 10  
                 humi = 20  
-                query = "INSERT INTO sensor_data (soil1, water, temp, humi, timestamp) VALUES (%s, %s, %s, %s, %s)"
+                query = "INSERT INTO sensor_log (soil, water, temp, humi, timestamp) VALUES (%s, %s, %s, %s, %s)"
                 cursor.execute(query, (soil_value, water_value, temp, humi, timestamp))
                 db.commit()
 

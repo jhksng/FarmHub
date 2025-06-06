@@ -2,7 +2,7 @@ int soil = A1;
 int water = A2;
 
 void setup() {
-	Serial.begin(9600)
+	Serial.begin(9600);
 }
 
 void loop() {

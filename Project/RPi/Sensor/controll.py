@@ -1,4 +1,4 @@
-from flask import flask, render_template, request
+from flask import Flask, render_template, request
 import RPi.GPIO as GPIO
 import time
 
@@ -7,12 +7,10 @@ app = Flask(__name__)
 
 #5v
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(5, GPIO.OUT)
-GPIO.setup(6, GPIO.OUT)
-GPIO.setup(13, GPIO.OUT)
-GPIO.setup(19, GPIO.OUT)
-#12v ptc
-GPIO.setup(26, GPIO.OUT)
+
+pins = [5, 6, 13, 19, 26]
+for pin in pins:
+	GPIO.setup(pin, GPIO.OUT)
 
 state = {
 	5: 1,
@@ -36,20 +34,20 @@ def controller():
 		state[5] = led
 	if 'CoolerA' in request.form:
 		A = int(request.form['CoolerA'])
-		GPIO.output(5, A)
-		state[5] = A
+		GPIO.output(6, A)
+		state[6] = A
 	if 'CoolerB' in request.form:
 		B = int(request.form['CoolerB'])
-		GPIO.output(5, B)
-		state[5] = B
+		GPIO.output(13, B)
+		state[13] = B
 	if 'WaterPump' in request.form:
 		w = int(request.form['WaterPump'])
-		GPIO.output(5, w)
-		state[5] = w
+		GPIO.output(16, w)
+		state[16] = w
 	if 'PTC' in request.form:
 		p = int(request.form['PTC'])
-		GPIO.output(5, p)
-		state[5] = p
+		GPIO.output(26, p)
+		state[26] = p
 	return render_template('view_control.html', state = state)
 
 if __name__=="__main__":

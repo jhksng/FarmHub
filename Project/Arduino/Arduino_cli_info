@@ -1,0 +1,36 @@
+-----Setting-----
+[Arduino cli install]
+curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+
+[config file create]
+arduino-cli config init
+
+[cat == dump]
+arduino-cli config dump 
+
+[environment address]
+sudo nano ~/.arduino15/arduino-cli.yaml
+
+[arduino board definition file install]
+arduino-cli core install arduino:avr
+
+[create sketch, dir+file]
+arduino-cli sketch new [sketch name]
+
+[board manager update]
+arduino-cli core update-index 
+
+[board connect check]
+arduino-cli board list
+
+
+-----command-----
+[only compile]
+arduino-cli compile -b arduino:avr:uno [project name]
+
+[only upload]
+arduino-cli upload -p /dev/ttyACM0 -b arduino:avr:uno [project name]
+
+[compile and upload]
+arduino-cli compile -b arduino:avr:uno [project name] -u -p [board]
+[board] - /dev/ttyACM0

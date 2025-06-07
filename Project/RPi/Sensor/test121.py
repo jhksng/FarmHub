@@ -10,20 +10,25 @@ from datetime import datetime
 try:
     i2c = board.I2C()
     sensor = adafruit_sht31d.SHT31D(i2c, address=0x44)
+    print("센서 초기화 성공")
 except Exception as e:
     print(f"❌ 센서 초기화 실패: {e}")
     sensor = None  # 예외 발생 시 None 처리
 
 def getTemp(sensor):
     try:
-        return round(float(sensor.temperature), 2)
+        temp = float(sensor.temperature)
+        print(f"Temperature: {temp}°C")
+        return round(temp, 2)
     except Exception as e:
         print(f"온도 측정 오류: {e}")
         return None
 
 def getHumi(sensor):
     try:
-        return round(float(sensor.relative_humidity), 2)
+        humi = float(sensor.relative_humidity)
+        print(f"Humidity: {humi}%")
+        return round(humi, 2)
     except Exception as e:
         print(f"습도 측정 오류: {e}")
         return None
@@ -32,6 +37,7 @@ def getHumi(sensor):
 try:
     arduino = serial.Serial('/dev/ttyACM0', 9600, timeout=2)
     time.sleep(2)
+    print("아두이노 연결 성공")
 except Exception as e:
     print(f"❌ 아두이노 연결 실패: {e}")
     exit(1)
@@ -45,6 +51,7 @@ try:
         database="sensor"
     )
     cursor = db.cursor()
+    print("DB 연결 성공")
 except Exception as e:
     print(f"❌ DB 연결 실패: {e}")
     exit(1)
@@ -65,6 +72,7 @@ try:
             water_value = float(values[1].strip())
             timestamp = datetime.now()
 
+            # 센서 값 읽기
             temp = getTemp(sensor)
             humi = getHumi(sensor)
 
@@ -72,10 +80,14 @@ try:
                 print("⚠️ 센서 값 오류, DB 삽입 생략")
                 continue
 
-            query = "INSERT INTO sensor_log (soil, water, temp, humi, timestamp) VALUES (%s, %s, %s, %s, %s)"
-            cursor.execute(query, (soil_value, water_value, temp, humi, timestamp))
-            db.commit()
-            print("✅ Data inserted into DB.")
+            # DB에 삽입
+            try:
+                query = "INSERT INTO sensor_log (soil, water, temp, humi, timestamp) VALUES (%s, %s, %s, %s, %s)"
+                cursor.execute(query, (soil_value, water_value, temp, humi, timestamp))
+                db.commit()
+                print("✅ Data inserted into DB.")
+            except Exception as e:
+                print(f"❌ DB 삽입 실패: {e}")
 
         except Exception as e:
             print(f"❌ 루프 내 오류: {e}")

@@ -8,8 +8,11 @@ pip install pyserial
 
 pip install mysql-connector-python
 
+pip install adafruit-circuitpython-sht31d
+
 apt install mariadb-server mariadb-client
 
 sudo apt-get install fonts-unfonts-core
 
 sudo apt-get install fonts-nanum
+

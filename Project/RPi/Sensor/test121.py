@@ -38,8 +38,8 @@ try:
     arduino = serial.Serial('/dev/ttyACM0', 9600, timeout=2)
     time.sleep(2)
     print("아두이노 연결 성공")
-except Exception as e:
-    print(f"❌ 아두이노 연결 실패: {e}")
+except serial.SerialException as e:
+    print(f"❌ 시리얼 연결 오류: {e}")
     exit(1)
 
 # DB 연결

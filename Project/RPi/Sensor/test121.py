@@ -1,103 +1,87 @@
 import serial
 import mysql.connector
 import time
-import board
-import busio
-import adafruit_sht31d
 from datetime import datetime
 
-# I2C 초기화 및 센서 객체 생성
+# SHT31D 센서용 라이브러리 추가
+import board
+import adafruit_sht31d
+
+# 온습도 센서 초기화
 try:
     i2c = board.I2C()
-    sensor = adafruit_sht31d.SHT31D(i2c, address=0x44)
-    print("센서 초기화 성공")
+    sensor = adafruit_sht31d.SHT31D(i2c)
 except Exception as e:
-    print(f"❌ 센서 초기화 실패: {e}")
-    sensor = None  # 예외 발생 시 None 처리
+    print(f"❌ 온습도 센서 초기화 실패: {e}")
+    sensor = None
 
-def getTemp(sensor):
+# 온도 읽기 함수
+def get_temperature():
     try:
-        temp = float(sensor.temperature)
-        print(f"Temperature: {temp}°C")
-        return round(temp, 2)
+        return round(sensor.temperature, 2)
     except Exception as e:
-        print(f"온도 측정 오류: {e}")
+        print(f"🌡️ 온도 읽기 오류: {e}")
         return None
 
-def getHumi(sensor):
+# 습도 읽기 함수
+def get_humidity():
     try:
-        humi = float(sensor.relative_humidity)
-        print(f"Humidity: {humi}%")
-        return round(humi, 2)
+        return round(sensor.relative_humidity, 2)
     except Exception as e:
-        print(f"습도 측정 오류: {e}")
+        print(f"💧 습도 읽기 오류: {e}")
         return None
 
-# Arduino 연결
-try:
-    arduino = serial.Serial('/dev/ttyACM0', 9600, timeout=2)
-    time.sleep(2)
-    print("아두이노 연결 성공")
-except serial.SerialException as e:
-    print(f"❌ 시리얼 연결 오류: {e}")
-    exit(1)
+# 아두이노 연결
+arduino = serial.Serial('/dev/ttyACM0', 9600)
+time.sleep(2)
 
-# DB 연결
-try:
-    db = mysql.connector.connect(
-        host="localhost", 
-        user="root", 
-        password="root", 
-        database="sensor"
-    )
-    cursor = db.cursor()
-    print("DB 연결 성공")
-except Exception as e:
-    print(f"❌ DB 연결 실패: {e}")
-    exit(1)
+# MySQL 연결
+db = mysql.connector.connect(
+    host="localhost", 
+    user="root", 
+    password="1234", 
+    database="sensor"
+)
+cursor = db.cursor()
 
-# 메인 루프
 try:
     while True:
-        try:
-            data = arduino.readline().decode('utf-8').strip()
-            print(f"[DEBUG] 수신 데이터: {data}")
-            values = data.split(",")
-
-            if len(values) != 2:
-                print("⚠️ 데이터 형식 오류, 건너뜀")
-                continue
-
-            soil_value = float(values[0].strip())
-            water_value = float(values[1].strip())
-            timestamp = datetime.now()
-
-            # 센서 값 읽기
-            temp = getTemp(sensor)
-            humi = getHumi(sensor)
-
-            if temp is None or humi is None:
-                print("⚠️ 센서 값 오류, DB 삽입 생략")
-                continue
-
-            # DB에 삽입
+        if arduino.in_waiting > 0:
             try:
+                data = arduino.readline().decode('utf-8').strip()
+                values = data.split(",")
+
+                if len(values) != 2:
+                    print(f"⚠️ 데이터 형식 오류: {data}")
+                    continue
+
+                soil_value = float(values[0].strip())  
+                water_value = float(values[1].strip())  
+                timestamp = datetime.now()
+
+                # 온습도 측정
+                temp = get_temperature()
+                humi = get_humidity()
+
+                # 센서 오류 시 건너뜀
+                if temp is None or humi is None:
+                    print("⚠️ 온습도 센서 오류, 데이터 저장 건너뜀")
+                    continue
+
+                # DB 저장
                 query = "INSERT INTO sensor_log (soil, water, temp, humi, timestamp) VALUES (%s, %s, %s, %s, %s)"
                 cursor.execute(query, (soil_value, water_value, temp, humi, timestamp))
                 db.commit()
-                print("✅ Data inserted into DB.")
+
+                print(f"✅ 저장됨 → 토양: {soil_value}, 수위: {water_value}, 온도: {temp}, 습도: {humi}")
             except Exception as e:
-                print(f"❌ DB 삽입 실패: {e}")
-
-        except Exception as e:
-            print(f"❌ 루프 내 오류: {e}")
-
+                print(f"❌ 파싱 또는 저장 오류: {e}")
         time.sleep(1)
 
 except KeyboardInterrupt:
-    print("🔌 프로그램 종료 요청됨")
+    print("⛔ 사용자 종료 요청됨")
 
 finally:
     cursor.close()
     db.close()
-    print("🛑 Database connection closed.")
+    print("🛑 데이터베이스 연결 종료됨")

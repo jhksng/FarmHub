@@ -23,10 +23,10 @@ db = mysql.connector.connect(
 
 cursor = db.cursor()
 
-def get_Temp(sensor):
+def getTemp(sensor):
   return float(sensor.temperature)
 
-def get_Humi(sensor):
+def getHumi(sensor):
   return float(sensor.relative_humidity)
 
 try:

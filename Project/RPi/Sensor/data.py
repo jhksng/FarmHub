@@ -1,7 +1,18 @@
 import serial
 import mysql.connector
 import time
+import board
+import busio
+import adafruit_sht31d
 from datetime import datetime
+
+i2c = board.I2C()
+sensor = adafruit_sht31d.SHT31D(i2c, address=0x44)
+
+def getTemp(sensor):
+    return float(sensor.temperature)
+def getHumi(sensor):
+    return float(sensor.relative_humidity)
 
 arduino = serial.Serial('/dev/ttyACM0', 9600)
 time.sleep(2)
@@ -24,8 +35,8 @@ try:
                 soil_value = float(values[0].strip())  
                 water_value = float(values[1].strip())  
                 timestamp = datetime.now()
-                temp = 10  
-                humi = 20  
+                temp = round(getTemp(sensor), 2)
+                humi = round(getHumi(sensor), 2)
                 query = "INSERT INTO sensor_log (soil, water, temp, humi, timestamp) VALUES (%s, %s, %s, %s, %s)"
                 cursor.execute(query, (soil_value, water_value, temp, humi, timestamp))
                 db.commit()

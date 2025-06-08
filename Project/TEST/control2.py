@@ -170,7 +170,7 @@ def status_log_loop():
 @app.route('/control')
 def control_page():
     selected_crop = "상추"
-    return render_template('view_control.html', state=state, crop=selected_crop)
+    return render_template('view_control2.html', state=state, crop=selected_crop)
 
 
 @app.route('/controller', methods=["POST"])
@@ -192,7 +192,7 @@ def controller():
                     light_timer['remaining_extension'] += off_duration
                     light_timer['manual_off_time'] = None
 
-    return render_template('view_control.html', state=state)
+    return render_template('view_control2.html', state=state)
 
 if __name__ == "__main__":
     threading.Thread(target=control_loop, daemon=True).start()

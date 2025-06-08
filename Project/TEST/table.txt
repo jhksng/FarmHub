@@ -13,8 +13,8 @@ CREATE TABLE crop_info (
     crop VARCHAR(20) NOT NULL UNIQUE,  -- 작물 이름 (유일하게 설정)
     target_temp FLOAT,                        -- 적정 온도
     target_humi FLOAT,                    -- 적정 습도
-    target_light FLOAT,                         -- 적정 조도
-    target_water FLOAT,                         -- 물 주는 주기 (시간)
+    target_light INT,                         -- 적정 조도
+    target_soil FLOAT,                         -- 토양 습도
     target_growth FLOAT,                      -- 자라는 데 걸리는 시간
     description TEXT,                  -- 설명
     image VARCHAR(255)                 -- 이미지 파일 이름

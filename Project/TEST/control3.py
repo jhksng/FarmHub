@@ -193,7 +193,10 @@ def control_page():
 
 @app.route('/photo', methods=['POST'])
 def photo():
-    take_photo()
+    try:
+        take_photo()
+    except Exception as e:
+        print(f"사진 촬영 실패: {e}")
     return redirect(url_for('photo_view'))
 
 @app.route('/photo_view')

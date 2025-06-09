@@ -6,7 +6,14 @@
 습도
 온도 < 히터 키기 끄기, 쿨러 가동 , 끄기
 
-
+CREATE TABLE sensor_log (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  soil INT NOT NULL,
+  water INT NOT NULL,
+  temp FLOAT NOT NULL,
+  humi FLOAT NOT NULL,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE crop_info (
     id INT AUTO_INCREMENT PRIMARY KEY,

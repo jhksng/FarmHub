@@ -52,6 +52,7 @@ def custom_crop():
     crop_name = request.form['crop']
     temp = request.form['temp']
     humidity = request.form['humidity']
+    soil = request.form['soil']
     light = request.form['light']
     water = request.form['water']
     growth = request.form['growth']
@@ -63,14 +64,14 @@ def custom_crop():
     if existing:
         cur.execute("""
             UPDATE crop_info
-            SET temp=%s, humidity=%s, light=%s, water=%s, growth=%s
+            SET temp=%s, humidity=%s, soil=%s, light=%s, water=%s, growth=%s
             WHERE crop=%s
-        """, (temp, humidity, light, water, growth, crop_name))
+        """, (temp, humidity, soil, light, water, growth, crop_name))
     else:
         cur.execute("""
-            INSERT INTO crop_info (crop, temp, humidity, light, water, growth)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (crop_name, temp, humidity, light, water, growth))
+            INSERT INTO crop_info (crop, temp, humidity, soil, light, water, growth)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (crop_name, temp, humidity, soil, light, water, growth))
 
     cur.execute("UPDATE users SET selected_crop = %s WHERE id = %s", (crop_name, user_id))
     get_db().connection.commit()
@@ -81,15 +82,10 @@ def custom_crop():
 @crop_bp.route('/confirm_crop')
 def confirm_crop():
     crop_name = request.args.get('crop')
-    user_id = session.get('user_id')
 
     cur = get_db().connection.cursor()
-    if crop_name == '사용자 지정':
-        cur.execute("SELECT * FROM custom_crop_info WHERE user_id = %s", (user_id,))
-        crop = cur.fetchone()
-    else:
-        cur.execute("SELECT * FROM crop_info WHERE crop = %s", (crop_name,))
-        crop = cur.fetchone()
+    cur.execute("SELECT * FROM crop_info WHERE crop = %s", (crop_name,))
+    crop = cur.fetchone()
     cur.close()
 
     if not crop:
@@ -110,8 +106,9 @@ def crop_information():
     cur.execute("SELECT * FROM crop_info WHERE crop = %s", (selected_crop,))
     crop_info = cur.fetchone()
 
-    cur.execute("SELECT * FROM crop_logs ORDER BY id DESC LIMIT 1")
+    cur.execute("SELECT * FROM sensor_log ORDER BY id DESC LIMIT 1")
     latest_log = cur.fetchone()
+
     cur.close()
 
     return render_template('cropInformation.html', record=latest_log, info=crop_info)

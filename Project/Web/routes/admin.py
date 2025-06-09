@@ -19,37 +19,40 @@ def admin_required(f):
 @admin_required
 def dashboard():
     cur = get_db().connection.cursor()
+
     cur.execute("""
         SELECT 
             ci.crop AS crop_name,
-            cl.timestamp,
-            cl.temp,
-            cl.humidity,
-            cl.light_seconds,
-            cl.growth
-        FROM crop_logs cl
-        JOIN crop_info ci ON cl.crop_id = ci.id
-        ORDER BY cl.id DESC
+            sl.timestamp,
+            sl.temp,
+            sl.humi,
+            sl.soil,
+            sl.water,
+            sl.light,
+            sl.growth
+        FROM sensor_log sl
+        JOIN crop_info ci ON sl.crop_id = ci.id
+        ORDER BY sl.id DESC
         LIMIT 50
     """)
     records = cur.fetchall()
 
+    # 날짜 포맷 처리
     for row in records:
         row['datetime'] = row['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
-        seconds = row['light_seconds']
-        row['light_str'] = f"{seconds // 3600}:{(seconds % 3600) // 60:02}:{seconds % 60:02}"
 
-    cur.execute("SELECT id, username, selected_crop FROM users ORDER BY id ASC")
+    # 사용자 목록
+    cur.execute("SELECT * FROM users ORDER BY id ASC")
     users = cur.fetchall()
 
-    cur.execute("SELECT id, crop, temp, humidity, light, water, growth FROM crop_info ORDER BY crop ASC")
+    # 작물 목록
+    cur.execute("SELECT id, crop, temp, humidity, soil, light, water, growth FROM crop_info ORDER BY crop ASC")
     crops = cur.fetchall()
 
     cur.close()
 
     content = render_template('admin_dashboard_content.html', records=records, users=users, crops=crops)
     return render_template('admin.html', content=content)
-
 
 @admin_bp.route('/control', methods=['GET', 'POST'])
 @admin_required
@@ -59,7 +62,6 @@ def control():
         flash(f"{device} 제어 명령 전송됨")
     return render_template('admin.html', content=render_template('admin_control.html'))
 
-
 @admin_bp.route('/add_crop', methods=['GET', 'POST'])
 @admin_required
 def add_crop():
@@ -67,6 +69,7 @@ def add_crop():
         crop = request.form['crop']
         temp = request.form['temp']
         humidity = request.form['humidity']
+        soil = request.form['soil']
         light = request.form['light']
         water = request.form['water']
         growth = request.form['growth']
@@ -80,9 +83,9 @@ def add_crop():
 
         cur = get_db().connection.cursor()
         cur.execute("""
-            INSERT INTO crop_info (crop, temp, humidity, light, water, growth, description, image)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        """, (crop, temp, humidity, light, water, growth, description, filename))
+            INSERT INTO crop_info (crop, temp, humidity, soil, light, water, growth, description, image)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (crop, temp, humidity, soil, light, water, growth, description, filename))
         get_db().connection.commit()
         cur.close()
 
@@ -90,7 +93,6 @@ def add_crop():
         return redirect(url_for('admin.dashboard'))
 
     return render_template('admin.html', content=render_template('admin_add_crop.html'))
-
 
 @admin_bp.route('/delete_user/<int:user_id>', methods=['POST'])
 @admin_required
@@ -102,7 +104,6 @@ def delete_user(user_id):
     flash("사용자가 삭제되었습니다.")
     return redirect(url_for('admin.dashboard'))
 
-
 @admin_bp.route('/edit_crop/<int:crop_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_crop(crop_id):
@@ -112,6 +113,7 @@ def edit_crop(crop_id):
         crop = request.form['crop']
         temp = request.form['temp']
         humidity = request.form['humidity']
+        soil = request.form['soil']
         light = request.form['light']
         water = request.form['water']
         growth = request.form['growth']
@@ -119,10 +121,10 @@ def edit_crop(crop_id):
 
         cur.execute("""
             UPDATE crop_info
-            SET crop = %s, temp = %s, humidity = %s, light = %s,
+            SET crop = %s, temp = %s, humidity = %s, soil = %s, light = %s,
                 water = %s, growth = %s, description = %s
             WHERE id = %s
-        """, (crop, temp, humidity, light, water, growth, description, crop_id))
+        """, (crop, temp, humidity, soil, light, water, growth, description, crop_id))
         get_db().connection.commit()
         cur.close()
 
@@ -138,7 +140,6 @@ def edit_crop(crop_id):
         return redirect(url_for('admin.dashboard'))
 
     return render_template('admin.html', content=render_template('admin_edit_crop.html', crop=crop))
-
 
 @admin_bp.route('/delete_crop/<int:crop_id>', methods=['POST'])
 @admin_required

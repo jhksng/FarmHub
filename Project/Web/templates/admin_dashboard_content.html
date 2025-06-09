@@ -1,41 +1,47 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
 
 <section class="dashboard-section">
-  <h2>데이터 기록 (최근 50개)</h2>
-  <table class="admin-table">
+  <h2>센서 로그 데이터</h2>
+  <table class="dashboard-table">
     <thead>
       <tr>
-        <th>작물</th>
-        <th>날짜</th>
-        <th>온도</th>
-        <th>습도</th>
-        <th>광량 시간</th>
-        <th>성장단계</th>
+        <th>작물 이름</th>
+        <th>온도 (℃)</th>
+        <th>습도 (%)</th>
+        <th>토양 수분</th>
+        <th>물 주기 (시간)</th>
+        <th>광량 (초)</th>
+        <th>생장 일수</th>
+        <th>기록 시간</th>
       </tr>
     </thead>
     <tbody>
-      {% for row in records %}
+      {% for r in records %}
       <tr>
-        <td>{{ row.crop_name }}</td>
-        <td>{{ row.datetime }}</td>
-        <td>{{ row.temp }}</td>
-        <td>{{ row.humidity }}</td>
-        <td>{{ row.light_str }}</td>
-        <td>{{ row.growth }}</td>
+        <td>{{ r.crop_name }}</td>
+        <td>{{ r.temp }}</td>
+        <td>{{ r.humi }}</td>
+        <td>{{ r.soil }}</td>
+        <td>{{ r.water }}</td>
+        <td>{{ r.light }}</td>
+        <td>{{ r.growth }}</td>
+        <td>{{ r.datetime }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 </section>
 
+
 <section class="dashboard-section">
   <h2>사용자 목록</h2>
-  <table class="admin-table">
+  <table class="dashboard-table">
     <thead>
       <tr>
         <th>아이디</th>
         <th>이름</th>
         <th>선택 작물</th>
+        <th>기르기 시작 시간</th>
         <th>작업</th>
       </tr>
     </thead>
@@ -45,8 +51,9 @@
         <td>{{ user.id }}</td>
         <td>{{ user.username }}</td>
         <td>{{ user.selected_crop }}</td>
+        <td>{{ user.selected_time}}</td>
         <td>
-          <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="post" style="display:inline;">
+          <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="post">
             <button type="submit" class="delete-btn">삭제</button>
           </form>
         </td>
@@ -58,12 +65,13 @@
 
 <section class="dashboard-section">
   <h2>등록된 작물</h2>
-  <table class="admin-table">
+  <table class="dashboard-table">
     <thead>
       <tr>
         <th>이름</th>
         <th>온도</th>
         <th>습도</th>
+        <th>토양 수분</th>
         <th>광량</th>
         <th>급수</th>
         <th>성장</th>
@@ -76,12 +84,13 @@
         <td>{{ crop.crop }}</td>
         <td>{{ crop.temp }}</td>
         <td>{{ crop.humidity }}</td>
+        <td>{{ crop.soil }}</td>
         <td>{{ crop.light }}</td>
         <td>{{ crop.water }}</td>
         <td>{{ crop.growth }}</td>
-        <td>
+        <td class="action-cell">
           <a href="{{ url_for('admin.edit_crop', crop_id=crop.id) }}" class="edit-btn">편집</a>
-          <form action="{{ url_for('admin.delete_crop', crop_id=crop.id) }}" method="post" style="display:inline;">
+          <form action="{{ url_for('admin.delete_crop', crop_id=crop.id) }}" method="post">
             <button type="submit" class="delete-btn">삭제</button>
           </form>
         </td>

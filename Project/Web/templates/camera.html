@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>카메라 스트리밍</title>
-  {% include "header.html" %}
-  <style>
-    .camera-box {
-      max-width: 800px;
-      margin: 40px auto;
-      text-align: center;
-    }
-    .camera-box img {
-      width: 100%;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>실시간 카메라</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: sans-serif;
+            padding: 30px;
+        }
+        img {
+            max-width: 500px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+        p {
+            margin-top: 20px;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-  <div class="camera-box">
     <h2>실시간 카메라</h2>
-
-    {# <img src="{{ url_for('camera.video_feed') }}" alt="Camera Stream"> #}
-  </div>
+    <img src="{{ image_url }}" alt="최근 식물 사진">
+    <p>페이지 접속 시 실시간으로 촬영된 사진입니다.</p>
 </body>
 </html>

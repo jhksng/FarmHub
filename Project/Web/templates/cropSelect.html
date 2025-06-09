@@ -8,57 +8,61 @@
   {% include "header.html" %}
 </head>
 <body>
-  <h2>작물 선택</h2>
+  <main class="select-container">
+    <h2>작물을 선택해주세요</h2>
 
-  <!-- 작물 선택 (GET 방식으로 변경) -->
-  <form method="get" action="{{ url_for('crop.crop_select') }}">
-    <label for="crop_name">작물을 선택하세요:</label>
-    <select name="crop_name" id="crop_name" onchange="this.form.submit()">
-      {% for crop in crops %}
-        <option value="{{ crop.crop }}" {% if selected_crop == crop.crop %}selected{% endif %}>{{ crop.crop }}</option>
-      {% endfor %}
-      <option value="사용자 지정" {% if selected_crop == '사용자 지정' %}selected{% endif %}>사용자 지정</option>
-    </select>
-  </form>
+    <!-- 작물 선택 폼 -->
+    <form method="get" action="{{ url_for('crop.crop_select') }}" class="select-form">
+      <label for="crop_name">작물:</label>
+      <select name="crop_name" id="crop_name" onchange="this.form.submit()">
+        {% for crop in crops %}
+          <option value="{{ crop.crop }}" {% if selected_crop == crop.crop %}selected{% endif %}>{{ crop.crop }}</option>
+        {% endfor %}
+        <option value="사용자 지정" {% if selected_crop == '사용자 지정' %}selected{% endif %}>사용자 지정</option>
+      </select>
+    </form>
 
-  {% if selected_crop == '사용자 지정' %}
-  <form method="post" action="{{ url_for('crop.custom_crop') }}" class="custom-crop-form">
-    <h3>사용자 지정 작물 정보 입력</h3>
-    <label>작물 이름: <input type="text" name="crop" required></label><br>
-    <label>온도 (℃): <input type="number" name="temp" required></label><br>
-    <label>습도 (%): <input type="number" name="humidity" required></label><br>
-    <label>빛 주는 주기: <input type="number" name="light" required></label><br>
-    <label>물 주는 주기: <input type="number" name="water" required></label><br>
-    <label>자라는 시간 (일): <input type="number" name="growth" required></label><br>
-    <button type="submit">저장</button>
-  </form>
-  {% else %}
-  <section class="plant-box">
-    <article class="plant-content">
-      <div class="plant-image">
-        {% if selected_info.image %}
-          <img src="{{ url_for('static', filename='images/crop_images/' + selected_info.image) }}" alt="{{ selected_info.crop }} 이미지">
-        {% else %}
-          <img src="{{ url_for('static', filename='images/crop_images/default.jpg') }}" alt="기본 작물 이미지">
-        {% endif %}
-      </div>
-      <div class="plant-details">
-        <h3 class="plant-name">{{ selected_info.crop }}</h3>
-        <p>온도: {{ selected_info.temp }}℃</p>
-        <p>습도: {{ selected_info.humidity }}%</p>
-        <p>빛 주는 주기: {{ selected_info.light }}시간</p>
-        <p>물 주는 주기: {{ selected_info.water }}</p>
-        <p>자라는 시간: {{ selected_info.growth }}일</p>
-        <p class="plant-desc">{{ selected_info.description or "이 작물은 햇빛과 적절한 수분을 필요로 합니다." }}</p>
-      </div>
-    </article>
-    <div class="button-wrapper">
-      <form action="{{ url_for('crop.confirm_crop') }}" method="get" class="confirm-form">
-        <input type="hidden" name="crop" value="{{ selected_info.crop }}">
-        <button type="submit">선택</button>
-      </form>
-    </div>
-  </section>
-  {% endif %}
+    {% if selected_crop == '사용자 지정' %}
+    <form method="post" action="{{ url_for('crop.custom_crop') }}" class="custom-crop-form">
+      <h3>사용자 지정 작물 정보 입력</h3>
+      <label>작물 이름: <input type="text" name="crop" required></label><br>
+      <label>온도 (℃): <input type="number" name="temp" required></label><br>
+      <label>습도 (%): <input type="number" name="humidity" required></label><br>
+      <label>토양 수분: <input type="number" name="soil" required></label><br>
+      <label>빛 주는 주기: <input type="number" name="light" required></label><br>
+      <label>물 주는 주기: <input type="number" name="water" required></label><br>
+      <label>자라는 시간 (일): <input type="number" name="growth" required></label><br>
+      <button type="submit">저장</button>
+    </form>
+    {% else %}
+    <section class="plant-box">
+      <article class="plant-content">
+        <div class="plant-image">
+          {% if selected_info.image %}
+            <img src="{{ url_for('static', filename='images/crop_images/' + selected_info.image) }}" alt="{{ selected_info.crop }} 이미지">
+          {% else %}
+            <img src="{{ url_for('static', filename='images/crop_images/default.jpg') }}" alt="기본 작물 이미지">
+          {% endif %}
+        </div>
+        <div class="plant-details">
+          <h3 class="plant-name">{{ selected_info.crop }}</h3>
+          <p>온도: {{ selected_info.temp }}℃</p>
+          <p>습도: {{ selected_info.humidity }}%</p>
+          <p>토양 수분: {{ selected_info.soil }}</p>
+          <p>빛 주는 주기: {{ selected_info.light }}시간</p>
+          <p>물 주는 주기: {{ selected_info.water }}시간</p>
+          <p>자라는 시간: {{ selected_info.growth }}일</p>
+          <p class="plant-desc">{{ selected_info.description or "이 작물은 햇빛과 적절한 수분을 필요로 합니다." }}</p>
+          <div class="button-wrapper">
+            <form action="{{ url_for('crop.confirm_crop') }}" method="get" class="confirm-form">
+              <input type="hidden" name="crop" value="{{ selected_info.crop }}">
+              <button type="submit">선택</button>
+            </form>
+          </div>
+        </div>
+      </article>
+    </section>
+    {% endif %}
+  </main>
 </body>
 </html>

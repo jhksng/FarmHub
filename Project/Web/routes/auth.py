@@ -3,9 +3,6 @@ from utils.db import get_db
 
 auth_bp = Blueprint('auth', __name__)
 
-
-auth_bp = Blueprint('auth', __name__)
-
 @auth_bp.route('/signin', methods=['GET', 'POST'])
 def signin():
     if request.method == 'POST':

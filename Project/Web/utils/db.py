@@ -1,5 +1,4 @@
 # utils/db.py
-
 # 전역 MySQL 인스턴스를 저장할 변수
 _mysql = None
 

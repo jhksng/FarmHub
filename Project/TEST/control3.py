@@ -44,7 +44,7 @@ def get_db_connection():
 def get_current_crop():
     db = get_db_connection()
     cursor = db.cursor()
-    cursor.execute("SELECT crop FROM crop_info LIMIT 1")
+    cursor.execute("SELECT crop FROM crop_info WHERE id = 1")
     result = cursor.fetchone()
     cursor.close()
     db.close()

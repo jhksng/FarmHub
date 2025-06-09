@@ -1,9 +1,11 @@
+from flask import Flask, render_template, request, redirect, url_for
 import time
 import threading
 import mysql.connector
 from datetime import datetime
 
-# 가상 핀 설정
+app = Flask(__name__)
+
 pins = {
     'LED': 5,
     'CoolerA': 6,
@@ -12,7 +14,6 @@ pins = {
     'PTC': 26
 }
 
-# on = 0 (켜짐), off = 1 (꺼짐)
 state = {pin: 1 for pin in pins.values()}
 light_timer = {
     'start_time': None,
@@ -21,7 +22,8 @@ light_timer = {
     'remaining_extension': 0
 }
 
-# DB 연결 함수
+# DB 연결
+
 def get_db_connection():
     return mysql.connector.connect(
         host="localhost",
@@ -30,7 +32,6 @@ def get_db_connection():
         database="sensor"
     )
 
-# 현재 작물 정보 가져오기
 def get_current_crop():
     db = get_db_connection()
     cursor = db.cursor()
@@ -40,7 +41,6 @@ def get_current_crop():
     db.close()
     return result[0] if result else None
 
-# 작물 정보 로드
 def load_crop_settings(crop_name):
     db = get_db_connection()
     cursor = db.cursor()
@@ -57,7 +57,6 @@ def load_crop_settings(crop_name):
         }
     return None
 
-# 센서값 로드
 def get_latest_sensor_values():
     db = get_db_connection()
     cursor = db.cursor()
@@ -74,13 +73,11 @@ def get_latest_sensor_values():
         }
     return None
 
-# 장치 제어 함수
 def control_device(name, value):
     action = "켜짐" if value == 0 else "꺼짐"
     print(f"{name} 제어: {action}")
     state[pins[name]] = value
 
-# 워터펌프 루틴
 def water_pump_routine():
     print("워터펌프 작동 시작")
     control_device('WaterPump', 0)
@@ -88,33 +85,12 @@ def water_pump_routine():
     control_device('WaterPump', 1)
     print("워터펌프 작동 중지")
 
-# 상태 저장 루프 (선택)
-def insert_status_to_db(crop_name):
-    db = get_db_connection()
-    cursor = db.cursor()
-    query = """
-        INSERT INTO sensor_status (crop, led, coolerA, coolerB, waterpump, ptc)
-        VALUES (%s, %s, %s, %s, %s, %s)
-    """
-    values = (
-        crop_name,
-        state[pins['LED']],
-        state[pins['CoolerA']],
-        state[pins['CoolerB']],
-        state[pins['WaterPump']],
-        state[pins['PTC']]
-    )
-    cursor.execute(query, values)
-    db.commit()
-    cursor.close()
-    db.close()
-
-# 자동 제어 루프
 last_water_time = datetime.min
-last_heat_time = datetime.min
+last_soil_check_timestamp = None
+water_cooldown_seconds = 600
 
 def control_loop():
-    global last_water_time, last_heat_time, light_timer
+    global last_water_time, last_soil_check_timestamp, light_timer
 
     while True:
         selected_crop = get_current_crop()
@@ -143,51 +119,34 @@ def control_loop():
                 print("생장등 자동 꺼짐 (시간 초과)")
                 control_device('LED', 1)
 
-        # 워터펌프 제어
-        if sensor['soil'] < crop_settings['soil'] and (now - last_water_time).total_seconds() >= 60:
+        # 워터펌프 제어 (센서 timestamp + 쿨다운 적용)
+        if (sensor['soil'] < crop_settings['soil'] and
+            sensor['timestamp'] != last_soil_check_timestamp and
+            (now - last_water_time).total_seconds() >= water_cooldown_seconds):
+
             print("토양 수분 부족 → 워터펌프 작동")
             threading.Thread(target=water_pump_routine).start()
             last_water_time = now
+            last_soil_check_timestamp = sensor['timestamp']
 
-        # 습도 제어
-        if sensor['humi'] > crop_settings['humi']:
-            print("습도 높음 → 쿨러 작동")
-            control_device('CoolerA', 1)
-            control_device('CoolerB', 1)
-        else:
-            print("습도 적정 → 쿨러 정지")
-            control_device('CoolerA', 0)
-            control_device('CoolerB', 0)
-
-        # 온도 제어
-        if sensor['temp'] < crop_settings['temp'] - 2 and (now - last_heat_time).total_seconds() >= 120:
-            print("온도 낮음 → 히터 작동")
-            control_device('PTC', 1)
-            time.sleep(120)
-            control_device('PTC', 0)
-            print("히터 정지 → 쿨러 작동")
-            control_device('CoolerB', 1)
-            time.sleep(60)
-            control_device('CoolerB', 0)
-            print("쿨러 정지")
-            last_heat_time = now
-        elif sensor['temp'] > crop_settings['temp'] + 2:
+        # 온도 기준 쿨러 제어
+        if sensor['temp'] > crop_settings['temp'] + 2:
             print("온도 높음 → 쿨러 작동")
             control_device('CoolerA', 1)
             control_device('CoolerB', 1)
+        else:
+            control_device('CoolerA', 0)
+            control_device('CoolerB', 0)
 
         time.sleep(10)
 
 def status_log_loop():
     while True:
         selected_crop = get_current_crop()
-        insert_status_to_db(selected_crop)
+        # DB에 상태 저장 로직 필요 시 구현
         time.sleep(60)
 
-# 실행
 if __name__ == "__main__":
     threading.Thread(target=control_loop, daemon=True).start()
     threading.Thread(target=status_log_loop, daemon=True).start()
-
-    while True:
-        time.sleep(1)  # 메인 스레드 유지용
+    app.run(host='0.0.0.0', port=9000, debug=True)

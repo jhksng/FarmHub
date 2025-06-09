@@ -1,4 +1,4 @@
-from picamera2 import Picamera2
+import subprocess
 from datetime import datetime
 import os
 import time
@@ -22,7 +22,7 @@ def get_crop_name_from_mysql():
         print(f"MySQL 오류: {err}")
         return "unknown"
 
-# 사진 촬영 함수
+# 사진 촬영 함수 (fswebcam 사용)
 def take_photo():
     crop_name = get_crop_name_from_mysql()
     now = datetime.now()
@@ -33,17 +33,19 @@ def take_photo():
     file_path = os.path.join(save_dir, filename)
 
     try:
-        picam2 = Picamera2()
-        picam2.start()
-        time.sleep(2)  # 카메라 워밍업
-        picam2.capture_file(file_path)
-        picam2.stop()
+        # fswebcam으로 사진 촬영
+        subprocess.run(
+            ["fswebcam", "-r", "1280x720", "--no-banner", file_path],
+            check=True
+        )
         print(f"[✔] 사진 저장 완료: {file_path}")
+    except subprocess.CalledProcessError as e:
+        print(f"[✘] fswebcam 실행 오류: {e}")
     except Exception as e:
-        print(f"[✘] 사진 촬영 오류: {e}")
+        print(f"[✘] 기타 오류: {e}")
 
-# 메인 루프: 1시간마다 촬영
+# 메인 루프: 1시간마다 촬영 (테스트용)
 if __name__ == "__main__":
     while True:
         take_photo()
-        time.sleep(3600)  # 1시간 대기
+        time.sleep(3600)

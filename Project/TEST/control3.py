@@ -214,28 +214,30 @@ def photo_view():
 def save_crop_settings(crop_name, temp, humi, light_duration, soil, growth_time, description="", image=""):
     db = get_db_connection()
     cursor = db.cursor()
-
-    cursor.execute("SELECT id FROM crop_info LIMIT 1")
+    
+    cursor.execute("SELECT 1 FROM crop_info WHERE id = 1")
     result = cursor.fetchone()
 
     if result:
-        crop_id = result[0]
+        # UPDATE
         cursor.execute("""
             UPDATE crop_info
             SET crop=%s, target_temp=%s, target_humi=%s, target_light=%s,
                 target_soil=%s, target_growth=%s, description=%s, image=%s
-            WHERE id=%s
-        """, (crop_name, temp, humi, light_duration, soil, growth_time, description, image, crop_id))
+            WHERE id = 1
+        """, (crop_name, temp, humi, light_duration, soil, growth_time, description, image))
     else:
+        # INSERT with id = 1
         cursor.execute("""
-            INSERT INTO crop_info (crop, target_temp, target_humi, target_light,
+            INSERT INTO crop_info (id, crop, target_temp, target_humi, target_light,
                 target_soil, target_growth, description, image)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (1, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (crop_name, temp, humi, light_duration, soil, growth_time, description, image))
 
     db.commit()
     cursor.close()
     db.close()
+
 
 @app.route('/set_crop', methods=['GET', 'POST'])
 def set_crop():

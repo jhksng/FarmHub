@@ -46,6 +46,5 @@ def take_photo():
 
 # 메인 루프: 1시간마다 촬영 (테스트용)
 if __name__ == "__main__":
-    while True:
-        take_photo()
-        time.sleep(3600)
+    take_photo()
+        

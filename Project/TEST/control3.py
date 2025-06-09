@@ -5,6 +5,8 @@ import threading
 import mysql.connector
 from datetime import datetime, timedelta
 
+from camera import take_photo
+
 app = Flask(__name__)
 
 # GPIO 설정
@@ -186,6 +188,11 @@ def status_log_loop():
 @app.route('/control')
 def control_page():
     return render_template('view_control2.html', state=state)
+
+@app.route('/photo', methods=['POST'])
+def photo():
+    take_photo()
+    return "사진을 찍었습니다!"
 
 @app.route('/controller', methods=["POST"])
 def controller():

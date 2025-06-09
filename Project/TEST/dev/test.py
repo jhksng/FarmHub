@@ -1,4 +1,3 @@
-# dht_reader.py
 import board
 import adafruit_dht
 import threading
@@ -17,11 +16,12 @@ class DHTReader:
             try:
                 self.temperature = self.dhtDevice.temperature
                 self.humidity = self.dhtDevice.humidity
+                print(f"[Sensor] Temp: {self.temperature}, Humidity: {self.humidity}")
             except Exception as e:
-                print("DHT read error:", e)
+                print("[Sensor Error]:", e)
                 self.temperature = None
                 self.humidity = None
-            time.sleep(5)  # 5초마다 갱신
+            time.sleep(5)
 
     def get_values(self):
         return self.temperature, self.humidity

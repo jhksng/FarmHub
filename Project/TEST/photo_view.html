@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>사진</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial;
+        }
+        img {
+            max-width: 80%;
+            height: auto;
+            border: 3px solid #444;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>최근 촬영된 사진</h1>
+    {% if photo %}
+        <img src="{{ photo }}" alt="최근 사진">
+    {% else %}
+        <p>아직 사진이 없습니다.</p>
+    {% endif %}
+</body>
+</html>

@@ -48,7 +48,7 @@ def get_current_crop():
     result = cursor.fetchone()
     cursor.close()
     db.close()
-    return result[0] if result else "상추"
+    return result[0] if result else None
 
 # 작물 정보 로드
 def load_crop_settings(crop_name):

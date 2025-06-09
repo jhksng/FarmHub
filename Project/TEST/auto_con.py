@@ -49,7 +49,7 @@ def load_crop_settings(crop_name):
         }
     return None
 
-# 최신 센서값 가져오기 (작물 필터 포함)
+# 최신 센서값 가져오기
 def get_latest_sensor_values(crop_name):
     db = get_db_connection()
     cursor = db.cursor()
@@ -92,7 +92,7 @@ def heater_routine():
     control_device('PTC', 1)
     print("히터 작동 종료")
 
-# 제어 루프 함수
+# 제어 루프
 def start_control_loop(crop_name, stop_event):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {crop_name} 제어 루프 시작됨.")
 
@@ -162,7 +162,7 @@ def start_control_loop(crop_name, stop_event):
 
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {crop_name} 제어 루프 종료됨.")
 
-# 웹 라우트
+# 웹 입력 폼
 def render_form():
     return render_template_string('''
         <h2>작물 이름을 입력하세요</h2>
@@ -172,12 +172,22 @@ def render_form():
         </form>
     ''')
 
+# 메인 웹 라우트
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global current_loop_thread, current_crop_name, stop_event
 
     if request.method == 'POST':
         crop_name = request.form['crop']
+
+        # DB에서 선택된 작물 갱신
+        db = get_db_connection()
+        cursor = db.cursor()
+        cursor.execute("UPDATE crop_info SET selected = 0")
+        cursor.execute("UPDATE crop_info SET selected = 1 WHERE crop = %s", (crop_name,))
+        db.commit()
+        cursor.close()
+        db.close()
 
         # 기존 루프 종료
         if current_loop_thread and current_loop_thread.is_alive():

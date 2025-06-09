@@ -42,15 +42,14 @@ def get_db_connection():
 
 # 현재 작물 정보 가져오기
 def get_current_crop():
-    #db = get_db_connection()
-    #cursor = db.cursor()
-    #cursor.execute("SELECT crop FROM current_crop ORDER BY updated_at DESC LIMIT 1")
-    #result = cursor.fetchone()
-    #cursor.close()
-    #db.close()
-    #return result[0] if result else "상추"
-    return "a"
-
+    db = get_db_connection()
+    cursor = db.cursor()
+    cursor.execute("SELECT crop FROM crop_info ORDER BY DESC LIMIT 1")
+    result = cursor.fetchone()
+    cursor.close()
+    db.close()
+    return result[0] if result else "상추"
+    
 # 작물 정보 로드
 def load_crop_settings(crop_name):
     db = get_db_connection()

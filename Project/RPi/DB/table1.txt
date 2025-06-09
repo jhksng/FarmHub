@@ -1,11 +1,3 @@
-조명시간
-
-토양 습도
-
-
-습도
-온도 < 히터 키기 끄기, 쿨러 가동 , 끄기
-
 CREATE TABLE sensor_log (
   id INT AUTO_INCREMENT PRIMARY KEY,
   soil INT NOT NULL,

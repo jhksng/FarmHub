@@ -1,9 +1,9 @@
 import time
 import threading
-import mysql.connector
 from datetime import datetime
+import mysql.connector
 
-# 핀 설정 (0 = ON, 1 = OFF)
+# 가상 핀 설정
 pins = {
     'LED': 5,
     'CoolerA': 6,
@@ -12,9 +12,11 @@ pins = {
     'PTC': 26
 }
 
+# ON = 0, OFF = 1
 state = {pin: 1 for pin in pins.values()}
 
 # DB 연결
+
 def get_db_connection():
     return mysql.connector.connect(
         host="localhost",
@@ -23,7 +25,8 @@ def get_db_connection():
         database="sensor"
     )
 
-# 현재 작물 정보
+# 현재 작물 가져오기
+
 def get_current_crop():
     db = get_db_connection()
     cursor = db.cursor()
@@ -33,7 +36,8 @@ def get_current_crop():
     db.close()
     return result[0] if result else None
 
-# 작물 설정 로드
+# 작물 설정 가져오기
+
 def load_crop_settings(crop_name):
     db = get_db_connection()
     cursor = db.cursor()
@@ -50,7 +54,8 @@ def load_crop_settings(crop_name):
         }
     return None
 
-# 센서값 로드
+# 최신 센서값 가져오기
+
 def get_latest_sensor_values():
     db = get_db_connection()
     cursor = db.cursor()
@@ -68,34 +73,44 @@ def get_latest_sensor_values():
     return None
 
 # 장치 제어 함수
-def control_device(name, value):
-    action = "ON" if value == 0 else "OFF"
-    print(f"{name} → {action}")
-    state[pins[name]] = value
 
-# 워터펌프 루틴 (10초 작동)
+def control_device(name, value):
+    state[pins[name]] = value
+    action = "켜짐" if value == 0 else "꺼짐"
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {name} 제어: {action}")
+
+# 워터펌프 루틴
+
 def water_pump_routine():
-    print("🌊 워터펌프 작동 시작")
+    print("워터펌프 작동 시작")
     control_device('WaterPump', 0)
     time.sleep(10)
     control_device('WaterPump', 1)
-    print("🌊 워터펌프 작동 종료")
+    print("워터펌프 작동 종료")
 
-# 초기값
-last_water_time = datetime.min
-last_heat_time = datetime.min
-last_soil_check_timestamp = None
-last_temp_check_timestamp = None
+# 히터 루틴
+
+def heater_routine():
+    print("히터 작동 시작")
+    control_device('PTC', 0)
+    time.sleep(60)
+    control_device('PTC', 1)
+    print("히터 작동 종료")
+
+# 초기 변수들
 light_timer = {'start_time': None, 'duration': 0, 'manual_off_time': None, 'remaining_extension': 0}
+last_water_time = datetime.min
+last_soil_check_timestamp = None
+last_heat_time = datetime.min
+last_temp_check_timestamp = None
+water_cooldown_seconds = 60
+heater_cooldown_seconds = 60
 
-# 루프
+# 제어 루프
+
 def control_loop():
-    global last_water_time, last_heat_time
-    global last_soil_check_timestamp, last_temp_check_timestamp, light_timer
-
     loop_count = 0
-    water_cooldown_seconds = 60
-    heat_cooldown_seconds = 60
+    global last_water_time, last_soil_check_timestamp, last_heat_time, last_temp_check_timestamp
 
     while True:
         loop_count += 1
@@ -104,51 +119,46 @@ def control_loop():
         selected_crop = get_current_crop()
         crop_settings = load_crop_settings(selected_crop)
         sensor = get_latest_sensor_values()
+        now = datetime.now()
 
         if not crop_settings or not sensor:
+            print("설정이나 센서값 없음. 10초 대기")
             time.sleep(10)
             continue
 
-        now = datetime.now()
-
-        # 생장등 (LED) 제어
+        # 생장등 제어
         if light_timer['start_time'] is None:
             light_timer['start_time'] = now
             light_timer['duration'] = crop_settings['light_duration']
-            print("💡 생장등 자동 켜짐")
             control_device('LED', 0)
-        else:
+        elif state[pins['LED']] == 0:
             total_duration = light_timer['duration'] * 3600 + light_timer['remaining_extension']
-            if (now - light_timer['start_time']).total_seconds() >= total_duration and state[pins['LED']] == 0:
-                print("💡 생장등 자동 꺼짐 (시간 만료)")
+            if (now - light_timer['start_time']).total_seconds() >= total_duration:
                 control_device('LED', 1)
 
-        # 워터펌프 제어 (토양 습도 + 센서 timestamp + 쿨다운)
+        # 워터펌프 조건
         if (sensor['soil'] < crop_settings['soil'] and
             sensor['timestamp'] != last_soil_check_timestamp and
             (now - last_water_time).total_seconds() >= water_cooldown_seconds):
 
-            print("🪴 토양 수분 부족 → 워터펌프 작동")
+            print("토양 수분 부족 → 워터펌프 작동")
             threading.Thread(target=water_pump_routine).start()
             last_water_time = now
             last_soil_check_timestamp = sensor['timestamp']
 
-        # 온도 기반 히터 제어 (쿨다운 + 센서 timestamp)
+        # 온도 낮을 때 히터 작동
         if (sensor['temp'] < crop_settings['temp'] - 2 and
             sensor['timestamp'] != last_temp_check_timestamp and
-            (now - last_heat_time).total_seconds() >= heat_cooldown_seconds):
+            (now - last_heat_time).total_seconds() >= heater_cooldown_seconds):
 
-            print("🔥 온도 낮음 → 히터 작동")
-            control_device('PTC', 0)
-            time.sleep(60)
-            control_device('PTC', 1)
-            print("🔥 히터 종료")
+            print("온도 낮음 → 히터 작동")
+            threading.Thread(target=heater_routine).start()
             last_heat_time = now
             last_temp_check_timestamp = sensor['timestamp']
 
-        # 온도 높을 경우 쿨러 작동
-        if sensor['temp'] > crop_settings['temp'] + 2:
-            print("❄️ 온도 높음 → 쿨러 작동")
+        # 온도 높을 때만 쿨러 작동
+        elif sensor['temp'] > crop_settings['temp'] + 2:
+            print("온도 높음 → 쿨러 작동")
             control_device('CoolerA', 0)
             control_device('CoolerB', 0)
         else:
@@ -157,6 +167,6 @@ def control_loop():
 
         time.sleep(10)
 
-# 실행
+# 시작
 if __name__ == "__main__":
     control_loop()

@@ -5,6 +5,7 @@ import threading
 import mysql.connector
 from datetime import datetime, timedelta
 
+from flask import redirect, url_for
 from camera import take_photo
 
 app = Flask(__name__, static_url_path='/static', static_folder='/home/pi/web')
@@ -192,7 +193,7 @@ def control_page():
 @app.route('/photo', methods=['POST'])
 def photo():
     take_photo()
-    return "사진을 찍었습니다!"
+    return redirect(url_for('photo_view'))
 
 @app.route('/photo_view')
 def photo_view():

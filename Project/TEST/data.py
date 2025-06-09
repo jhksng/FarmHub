@@ -14,26 +14,44 @@ sensor = adafruit_sht31d.SHT31D(i2c, address=0x44)
 arduino = serial.Serial('/dev/ttyACM0', 9600)
 time.sleep(2)
 
-# DB 연결
-db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="1234",
-    database="sensor"
-)
-cursor = db.cursor()
+# 선택된 작물 이름 가져오기
+def get_selected_crop():
+    try:
+        db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="1234",
+            database="sensor"
+        )
+        cursor = db.cursor()
+        cursor.execute("SELECT crop FROM crop_info WHERE selected = 1 LIMIT 1")
 
+        if cursor.with_rows:
+            result = cursor.fetchone()
+            return result[0] if result else None
+        else:
+            print("⚠️ SELECT 문이 결과를 반환하지 않았습니다.")
+            return None
+
+    except mysql.connector.Error as err:
+        print(f"❌ DB 오류 발생: {err}")
+        return None
+
+    finally:
+        try:
+            cursor.close()
+            db.close()
+        except:
+            pass
+
+# 온도 습도 읽기
 def getTemp(sensor):
     return float(sensor.temperature)
 
 def getHumi(sensor):
     return float(sensor.relative_humidity)
 
-def get_selected_crop():
-    cursor.execute("SELECT crop FROM crop_info WHERE selected = 1 LIMIT 1")
-    result = cursor.fetchone()
-    return result[0] if result else None
-
+# 센서 루프
 try:
     while True:
         selected_crop = get_selected_crop()
@@ -47,20 +65,34 @@ try:
                 data = arduino.readline().decode('utf-8').strip()
                 values = data.split(",")
 
+                if len(values) < 2:
+                    print("🚫 잘못된 데이터 형식:", data)
+                    continue
+
                 soil_value = float(values[0].strip())
                 water_value = float(values[1].strip())
                 temp = round(getTemp(sensor), 2)
                 humi = round(getHumi(sensor), 2)
                 timestamp = datetime.now()
 
+                # DB 연결
+                db = mysql.connector.connect(
+                    host="localhost",
+                    user="root",
+                    password="1234",
+                    database="sensor"
+                )
+                cursor = db.cursor()
                 query = """
                     INSERT INTO sensor_log (crop, soil, water, temp, humi, timestamp)
                     VALUES (%s, %s, %s, %s, %s, %s)
                 """
                 cursor.execute(query, (selected_crop, soil_value, water_value, temp, humi, timestamp))
                 db.commit()
+                cursor.close()
+                db.close()
 
-                print(f"[{timestamp}] {selected_crop} → 센서 데이터 저장 완료")
+                print(f"[{timestamp}] '{selected_crop}' → 센서 데이터 저장 완료")
 
             except Exception as e:
                 print(f"데이터 파싱/저장 오류: {e}")
@@ -68,6 +100,4 @@ try:
         time.sleep(1)
 
 finally:
-    cursor.close()
-    db.close()
-    print("Database connection closed.")
+    print("📦 프로그램 종료됨.")

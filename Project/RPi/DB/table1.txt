@@ -4,7 +4,8 @@ CREATE TABLE sensor_log (
   water INT NOT NULL,
   temp FLOAT NOT NULL,
   humi FLOAT NOT NULL,
-  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  crop varchar(20)
 );
 
 CREATE TABLE crop_info (
@@ -16,7 +17,8 @@ CREATE TABLE crop_info (
     target_soil FLOAT,                         -- 토양 습도
     target_growth FLOAT,                      -- 자라는 데 걸리는 시간
     description TEXT,                  -- 설명
-    image VARCHAR(255)                 -- 이미지 파일 이름
+    image VARCHAR(255),                 -- 이미지 파일 이름
+    selected TINYINT DEFAULT 0;
 );
 
 

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from camera import take_photo
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='/home/pi/web')
 
 # GPIO 설정
 GPIO.setmode(GPIO.BCM)
@@ -193,6 +193,19 @@ def control_page():
 def photo():
     take_photo()
     return "사진을 찍었습니다!"
+
+@app.route('/photo_view')
+def photo_view():
+    photo_dir = "/home/pi/web/photos"
+    photo_files = sorted(glob.glob(os.path.join(photo_dir, "*.jpg")), reverse=True)
+    latest_photo = None
+
+    if photo_files:
+        filename = os.path.basename(photo_files[0])
+        latest_photo = f"/static/photos/{filename}"
+
+    return render_template("photo_view.html", photo=latest_photo)
+
 
 @app.route('/controller', methods=["POST"])
 def controller():

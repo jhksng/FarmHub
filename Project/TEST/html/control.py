@@ -22,8 +22,9 @@ pins = {
 }
 for pin in pins.values():
     GPIO.setup(pin, GPIO.OUT)
+# 릴레이 모듈 이용하기에 1이 OFF
+state = {pin: 1 for pin in pins.values()}
 
-state = {pin: 0 for pin in pins.values()}
 light_timer = {
     'start_time': None,
     'duration': 0,

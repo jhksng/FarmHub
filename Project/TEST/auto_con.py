@@ -1,12 +1,12 @@
-from flask import Flask, request, render_template_string
 import time
 import threading
 from datetime import datetime
+from flask import Flask, request, render_template_string
 import mysql.connector
 
 app = Flask(__name__)
 
-# 핀 설정
+# 가상 핀 설정
 pins = {
     'LED': 5,
     'CoolerA': 6,
@@ -15,9 +15,15 @@ pins = {
     'PTC': 26
 }
 
+# ON = 0, OFF = 1
 state = {pin: 1 for pin in pins.values()}
 
-# DB 연결
+# 전역 제어 변수
+current_loop_thread = None
+current_crop_name = None
+stop_event = threading.Event()
+
+# DB 연결 함수
 def get_db_connection():
     return mysql.connector.connect(
         host="localhost",
@@ -26,7 +32,7 @@ def get_db_connection():
         database="sensor"
     )
 
-# crop 설정 로드
+# 작물 설정 가져오기
 def load_crop_settings(crop_name):
     db = get_db_connection()
     cursor = db.cursor()
@@ -43,16 +49,14 @@ def load_crop_settings(crop_name):
         }
     return None
 
-# crop별 최신 센서값
+# 최신 센서값 가져오기 (작물 필터 포함)
 def get_latest_sensor_values(crop_name):
     db = get_db_connection()
     cursor = db.cursor()
     cursor.execute("""
-        SELECT temp, humi, soil, timestamp
-        FROM sensor_log
+        SELECT temp, humi, soil, timestamp FROM sensor_log
         WHERE crop = %s
-        ORDER BY timestamp DESC
-        LIMIT 1
+        ORDER BY timestamp DESC LIMIT 1
     """, (crop_name,))
     result = cursor.fetchone()
     cursor.close()
@@ -72,19 +76,26 @@ def control_device(name, value):
     action = "켜짐" if value == 0 else "꺼짐"
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {name} 제어: {action}")
 
-# 루틴 함수
+# 워터펌프 루틴
 def water_pump_routine():
+    print("워터펌프 작동 시작")
     control_device('WaterPump', 0)
     time.sleep(10)
     control_device('WaterPump', 1)
+    print("워터펌프 작동 종료")
 
+# 히터 루틴
 def heater_routine():
+    print("히터 작동 시작")
     control_device('PTC', 0)
     time.sleep(60)
     control_device('PTC', 1)
+    print("히터 작동 종료")
 
 # 제어 루프 함수
-def start_control_loop(crop_name):
+def start_control_loop(crop_name, stop_event):
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {crop_name} 제어 루프 시작됨.")
+
     light_timer = {'start_time': None, 'duration': 0, 'manual_off_time': None, 'remaining_extension': 0}
     last_water_time = datetime.min
     last_soil_check_timestamp = None
@@ -92,11 +103,13 @@ def start_control_loop(crop_name):
     last_temp_check_timestamp = None
     water_cooldown_seconds = 60
     heater_cooldown_seconds = 60
+
     loop_count = 0
 
-    while True:
+    while not stop_event.is_set():
         loop_count += 1
         print(f"\n--- {loop_count}번째 루프 ({crop_name}) ---")
+
         crop_settings = load_crop_settings(crop_name)
         sensor = get_latest_sensor_values(crop_name)
         now = datetime.now()
@@ -116,24 +129,29 @@ def start_control_loop(crop_name):
             if (now - light_timer['start_time']).total_seconds() >= total_duration:
                 control_device('LED', 1)
 
-        # 워터펌프
+        # 워터펌프 조건
         if (sensor['soil'] < crop_settings['soil'] and
             sensor['timestamp'] != last_soil_check_timestamp and
             (now - last_water_time).total_seconds() >= water_cooldown_seconds):
+
+            print("토양 수분 부족 → 워터펌프 작동")
             threading.Thread(target=water_pump_routine).start()
             last_water_time = now
             last_soil_check_timestamp = sensor['timestamp']
 
-        # 히터
+        # 히터 조건
         if (sensor['temp'] < crop_settings['temp'] - 2 and
             sensor['timestamp'] != last_temp_check_timestamp and
             (now - last_heat_time).total_seconds() >= heater_cooldown_seconds):
+
+            print("온도 낮음 → 히터 작동")
             threading.Thread(target=heater_routine).start()
             last_heat_time = now
             last_temp_check_timestamp = sensor['timestamp']
 
-        # 쿨러
+        # 쿨러 조건
         elif sensor['temp'] > crop_settings['temp'] + 2:
+            print("온도 높음 → 쿨러 작동")
             control_device('CoolerA', 0)
             control_device('CoolerB', 0)
         else:
@@ -142,14 +160,10 @@ def start_control_loop(crop_name):
 
         time.sleep(10)
 
-# 웹 인터페이스
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        crop_name = request.form['crop']
-        threading.Thread(target=start_control_loop, args=(crop_name,), daemon=True).start()
-        return f"<h3>{crop_name} 작물에 대한 제어 루프가 시작되었습니다.</h3>"
-    
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {crop_name} 제어 루프 종료됨.")
+
+# 웹 라우트
+def render_form():
     return render_template_string('''
         <h2>작물 이름을 입력하세요</h2>
         <form method="post">
@@ -158,6 +172,27 @@ def index():
         </form>
     ''')
 
-# Flask 실행
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    global current_loop_thread, current_crop_name, stop_event
+
+    if request.method == 'POST':
+        crop_name = request.form['crop']
+
+        # 기존 루프 종료
+        if current_loop_thread and current_loop_thread.is_alive():
+            stop_event.set()
+            current_loop_thread.join()
+
+        # 새 루프 시작
+        stop_event = threading.Event()
+        current_crop_name = crop_name
+        current_loop_thread = threading.Thread(target=start_control_loop, args=(crop_name, stop_event), daemon=True)
+        current_loop_thread.start()
+
+        return f"<h3>{crop_name} 작물 제어 루프 시작됨.</h3>"
+
+    return render_form()
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)

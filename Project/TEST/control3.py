@@ -44,12 +44,12 @@ def get_db_connection():
 def get_current_crop():
     db = get_db_connection()
     cursor = db.cursor()
-    cursor.execute("SELECT crop FROM crop_info ORDER BY DESC LIMIT 1")
+    cursor.execute("SELECT crop FROM crop_info LIMIT 1")
     result = cursor.fetchone()
     cursor.close()
     db.close()
     return result[0] if result else "상추"
-    
+
 # 작물 정보 로드
 def load_crop_settings(crop_name):
     db = get_db_connection()
@@ -209,6 +209,50 @@ def photo_view():
         latest_photo = f"/static/photos/{filename}"
 
     return render_template("photo_view.html", photo=latest_photo)
+
+#작물 지정
+def save_crop_settings(crop_name, temp, humi, light_duration, soil, growth_time, description="", image=""):
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    cursor.execute("SELECT id FROM crop_info LIMIT 1")
+    result = cursor.fetchone()
+
+    if result:
+        crop_id = result[0]
+        cursor.execute("""
+            UPDATE crop_info
+            SET crop=%s, target_temp=%s, target_humi=%s, target_light=%s,
+                target_soil=%s, target_growth=%s, description=%s, image=%s
+            WHERE id=%s
+        """, (crop_name, temp, humi, light_duration, soil, growth_time, description, image, crop_id))
+    else:
+        cursor.execute("""
+            INSERT INTO crop_info (crop, target_temp, target_humi, target_light,
+                target_soil, target_growth, description, image)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (crop_name, temp, humi, light_duration, soil, growth_time, description, image))
+
+    db.commit()
+    cursor.close()
+    db.close()
+
+@app.route('/set_crop', methods=['GET', 'POST'])
+def set_crop():
+    if request.method == 'POST':
+        crop_name = request.form['crop']
+        temp = float(request.form['temp'])
+        humi = float(request.form['humi'])
+        light = int(request.form['light'])
+        soil = float(request.form['soil'])
+        growth = float(request.form['growth'])
+        desc = request.form.get('description', '')
+        image = request.form.get('image', '')
+
+        save_crop_settings(crop_name, temp, humi, light, soil, growth, desc, image)
+        return redirect(url_for('control_page'))
+
+    return render_template('set_crop.html')
 
 
 @app.route('/controller', methods=["POST"])

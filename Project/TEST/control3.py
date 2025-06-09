@@ -38,13 +38,14 @@ def get_db_connection():
 
 # 현재 작물 정보 가져오기
 def get_current_crop():
-    db = get_db_connection()
-    cursor = db.cursor()
-    cursor.execute("SELECT crop FROM current_crop ORDER BY updated_at DESC LIMIT 1")
-    result = cursor.fetchone()
-    cursor.close()
-    db.close()
-    return result[0] if result else "상추"
+    #db = get_db_connection()
+    #cursor = db.cursor()
+    #cursor.execute("SELECT crop FROM current_crop ORDER BY updated_at DESC LIMIT 1")
+    #result = cursor.fetchone()
+    #cursor.close()
+    #db.close()
+    #return result[0] if result else "상추"
+    return "a"
 
 # 작물 정보 로드
 def load_crop_settings(crop_name):
@@ -101,9 +102,9 @@ def insert_status_to_db(crop_name):
     cursor.close()
     db.close()
 
-# 제어 함수들
+# 제어 함수
 def control_device(name, value):
-    GPIO.output(pins[name], value)
+    GPIO.output(pins[name], 0 if value == 1 else 1)
     state[pins[name]] = value
 
 def water_pump_routine():

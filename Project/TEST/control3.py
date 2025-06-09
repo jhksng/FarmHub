@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from flask import redirect, url_for
 from camera import take_photo
-
+import glob
 app = Flask(__name__, static_url_path='/static', static_folder='/home/pi/web')
 
 # GPIO 설정

@@ -1,15 +1,3 @@
-CREATE TABLE sensor_log (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  soil INT NOT NULL,
-  water INT NOT NULL,
-  temp FLOAT NOT NULL,
-  humi FLOAT NOT NULL,
-  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-
-
-
 sudo vi /etc/mysql/mariadb.cnf
 
 time set

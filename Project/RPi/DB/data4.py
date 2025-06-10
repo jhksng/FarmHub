@@ -2,7 +2,7 @@ import serial
 import mysql.connector
 import time
 from datetime import datetime, date, timedelta
-import sys # sys 모듈 추가
+import sys
 
 # 라즈베리파이 하드웨어 제어 및 센서 라이브러리 import
 import board
@@ -13,7 +13,7 @@ try:
     i2c = board.I2C()
     sensor = adafruit_sht31d.SHT31D(i2c, address=0x44)
     print("✅ I2C 센서 초기화 완료.")
-    sys.stdout.flush() # 즉시 출력
+    sys.stdout.flush()
 except Exception as e:
     print(f"❌ I2C 센서 초기화 오류: {e}")
     sys.stdout.flush()
@@ -32,7 +32,11 @@ except serial.SerialException as e:
 
 
 def get_user_crop_and_time(username_to_fetch):
-    # ... (이 함수는 변경 없음) ...
+    """
+    users 테이블에서 특정 사용자의 선택된 작물 이름과 선택 시간을 가져옵니다.
+    :param username_to_fetch: 정보를 가져올 사용자의 username.
+    :return: {'selected_crop_name': str, 'selected_time': datetime} 또는 None.
+    """
     db = None
     cursor = None
     try:
@@ -71,7 +75,11 @@ def get_user_crop_and_time(username_to_fetch):
 
 
 def get_crop_info_by_name(crop_name):
-    # ... (이 함수는 변경 없음) ...
+    """
+    crop_name을 사용하여 crop_info 테이블에서 작물 ID, 이름, target_light, target_growth 정보를 가져옵니다.
+    :param crop_name: 조회할 작물의 이름.
+    :return: {'id': int, 'name': str, 'target_light': float, 'target_growth': float} 또는 None.
+    """
     db = None
     cursor = None
     try:
@@ -90,8 +98,8 @@ def get_crop_info_by_name(crop_name):
             return {
                 'id': result[0],
                 'name': result[1],
-                'target_light': float(result[2]),
-                'target_growth': float(result[3])
+                'target_light': float(result[2]), # 하루 필요한 조도량 (시간)
+                'target_growth': float(result[3]) # 수확 가능 일수
             }
         else:
             print(f"⚠️ '{crop_name}' 작물을 crop_info 테이블에서 찾을 수 없습니다.")
@@ -115,6 +123,7 @@ def get_crop_info_by_name(crop_name):
 
 
 def getTemp(sensor_obj):
+    """SHT31D 센서에서 온도를 읽어옵니다."""
     try:
         return float(sensor_obj.temperature)
     except Exception as e:
@@ -123,6 +132,7 @@ def getTemp(sensor_obj):
         return 0.0
 
 def getHumi(sensor_obj):
+    """SHT31D 센서에서 습도를 읽어옵니다."""
     try:
         return float(sensor_obj.relative_humidity)
     except Exception as e:
@@ -132,6 +142,10 @@ def getHumi(sensor_obj):
 
 
 def collect_and_save_sensor_data():
+    """
+    센서 데이터를 1분 동안 수집(10초 간격 6회), 평균을 계산하여 MySQL 데이터베이스에 저장합니다.
+    (크론탭으로 매 분 실행되도록 설계)
+    """
     if 'arduino' not in globals() or not arduino.is_open:
         print("❌ 아두이노 시리얼이 연결되지 않았습니다. 작업 중단.")
         sys.stdout.flush()
@@ -141,7 +155,7 @@ def collect_and_save_sensor_data():
         sys.stdout.flush()
         return
 
-    user_data = get_user_crop_and_time(username_to_fetch="admin")
+    user_data = get_user_crop_and_time(username_to_fetch="admin") # <-- 사용자 이름 여기 수정!
     if not user_data:
         print("사용자 정보나 선택된 작물이 없어 센서 데이터 수집을 시작할 수 없습니다.")
         sys.stdout.flush()
@@ -177,21 +191,23 @@ def collect_and_save_sensor_data():
     print(f"   작물 목표: 하루 일조량 {target_light_hours}시간, 수확까지 {harvest_days}일")
     sys.stdout.flush()
 
-    for i in range(6):
+    for i in range(6): # 10초마다 6번 = 1분
         try:
-            # 입력 버퍼를 확실히 비웁니다.
+            # --- 아두이노로부터 데이터 수신 로직 강화 ---
+            # 1. 시리얼 입력 버퍼를 완전히 비웁니다.
             arduino.reset_input_buffer()
-            # 아두이노가 데이터를 보낼 시간을 충분히 줍니다.
-            time.sleep(0.5) # 0.1초에서 0.5초로 늘려보세요.
+            # 2. 아두이노가 데이터를 보내기 시작할 시간을 잠시 기다립니다.
+            time.sleep(0.5) # 아두이노가 0.1초마다 보내면 0.5초 대기하면 5개 정도 쌓일 수 있음
 
+            # 3. 버퍼에 데이터가 실제로 있는지 확인 후 읽기 시도
             if arduino.in_waiting > 0:
                 data = arduino.readline().decode('utf-8').strip()
-                print(f"DEBUG: 수신 데이터: '{data}'") # 디버그용 출력
+                print(f"DEBUG: {i+1}/6 수신 데이터: '{data}'") # 디버그용 출력 강화
                 sys.stdout.flush()
 
                 values = data.split(",")
 
-                if len(values) >= 2: # soil, water만 있다고 가정
+                if len(values) >= 2:
                     try:
                         soil = float(values[0].strip())
                         water = float(values[1].strip())
@@ -204,23 +220,26 @@ def collect_and_save_sensor_data():
                         temp_values.append(temp)
                         humi_values.append(humi)
 
-                        print(f"📥 {i+1}/6 수집: Soil={soil:.2f}, Water={water:.2f}, Temp={temp:.2f}, Humi={humi:.2f}")
+                        print(f"📥 {i+1}/6 수집 성공: Soil={soil:.2f}, Water={water:.2f}, Temp={temp:.2f}, Humi={humi:.2f}")
                         sys.stdout.flush()
                     except ValueError:
-                        print(f"🚫 데이터 변환 오류: '{data}' - 숫자 형식 확인 필요.")
+                        print(f"🚫 {i+1}/6 데이터 변환 오류: '{data}' - 숫자 형식 확인 필요.")
                         sys.stdout.flush()
                 else:
-                    print(f"🚫 잘못된 데이터 형식: '{data}' (기대: soil,water)")
+                    print(f"🚫 {i+1}/6 잘못된 데이터 형식: '{data}' (기대: soil,water)")
                     sys.stdout.flush()
             else:
                 print(f"⚠️ {i+1}/6 수집: 아두이노 데이터 수신 대기 중... (버퍼 비어있음)")
                 sys.stdout.flush()
 
+        except serial.SerialTimeoutException:
+            print(f"❌ {i+1}/6 시리얼 타임아웃 발생! 아두이노 응답 없음.")
+            sys.stdout.flush()
         except Exception as e:
-            print(f"🚫 센서 데이터 읽기/파싱 중 예상치 못한 오류: {e}")
+            print(f"🚫 {i+1}/6 센서 데이터 읽기/파싱 중 예상치 못한 오류: {e}")
             sys.stdout.flush()
 
-        time.sleep(10)
+        time.sleep(10) # 다음 수집까지 10초 대기
 
     if soil_values and water_values and temp_values and humi_values:
         avg_soil = round(sum(soil_values) / len(soil_values), 2)
@@ -228,8 +247,12 @@ def collect_and_save_sensor_data():
         avg_temp = round(sum(temp_values) / len(temp_values), 2)
         avg_humi = round(sum(humi_values) / len(humi_values), 2)
 
-        light_value_for_db = 0.0
+        # --- light 컬럼 계산 (users.selected_time 기준으로 파이썬에서 계산) ---
+        # 아두이노에서 조도 센서 값을 받지 않으므로, 'crop_info.target_light' 값을 그대로 기록합니다.
+        # 이 값은 "오늘 하루의 목표 일조 시간"을 의미합니다.
+        light_value_for_db = target_light_hours # crop_info에 저장된 목표 일조량 (시간)
 
+        # --- growth (생장률) 계산: 선택 시간과 목표 수확일 기준 ---
         current_time_korea = datetime.now()
         today = current_time_korea.date()
         start_date = selected_time.date()
@@ -258,7 +281,7 @@ def collect_and_save_sensor_data():
 
             print(f"\n✅ [{timestamp.strftime('%Y-%m-%d %H:%M:%S')}] '{crop_name_for_log}' (ID: {crop_id}) 작물의 센서 데이터 저장 완료")
             print(f"   **생장률**: {growth:.2f} (경과 {elapsed_days}일 / 목표 {harvest_days}일)")
-            print(f"   **light 컬럼**: {light_value_for_db:.2f} (아두이노에서 조도값 수신 불가)")
+            print(f"   **light 컬럼 (목표 일조 시간)**: {light_value_for_db:.2f} 시간")
             sys.stdout.flush()
 
         except Exception as e:

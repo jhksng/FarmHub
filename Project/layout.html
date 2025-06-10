@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>스마트팜 제어 시스템</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">SmartFarm</a>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="{{ url_for('control.select_crop') }}">작물 선택</a></li>
+                <li><a href="{{ url_for('main.status') }}">작물 상태</a></li>
+                <li><a href="{{ url_for('control.manual_control') }}">수동 제어</a></li>
+                <li><a href="{{ url_for('camera.show_camera') }}">카메라</a></li>
+                <li><a href="{{ url_for('ai.show_ai_analysis') }}">AI 분석</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="content-wrapper">
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>

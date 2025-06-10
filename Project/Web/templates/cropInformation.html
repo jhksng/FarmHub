@@ -15,39 +15,40 @@
       <!-- 온도 -->
       <div class="control-item">
         <img src="{{ url_for('static', filename='images/icon_images/temp.png') }}" alt="온도" class="icon">
-        <p>현재 {{ record.temp }}℃ / 적정 온도 {{ info.temp }}℃</p>
+        <p>현재 {{ record.temp }}℃ / 적정 온도 {{ info.target_temp }}℃</p>
       </div>
 
       <!-- 습도 -->
       <div class="control-item">
         <img src="{{ url_for('static', filename='images/icon_images/humidity.png') }}" alt="습도" class="icon">
-        <p>현재 습도 {{ record.humi }}% / 적정 습도 {{ info.humidity }}%</p>
+        <p>현재 습도 {{ record.humi }}% / 적정 습도 {{ info.target_humi }}%</p>
       </div>
 
       <!-- 토양 수분 -->
       <div class="control-item">
         <img src="{{ url_for('static', filename='images/icon_images/soil.png') }}" alt="토양 수분" class="icon">
-        <p>현재 토양 수분 {{ record.soil }} / 적정 토양 수분 {{ info.soil }}</p>
+        <p>현재 토양 수분 {{ record.soil }} / 적정 토양 수분 {{ info.target_soil }}</p>
       </div>
 
       <!-- 광량 -->
       <div class="control-item">
         <img src="{{ url_for('static', filename='images/icon_images/light.png') }}" alt="광량" class="icon">
-        <p>누적 광량: {{ record.light }}초 / 목표: {{ info.light }}시간</p>
+        <p>누적 광량: {{ record.light }}초 / 목표: {{ info.target_light }}시간</p>
       </div>
 
       <!-- 물 주는 주기 -->
       <div class="control-item">
         <img src="{{ url_for('static', filename='images/icon_images/water.png') }}" alt="물주기" class="icon">
-        <p>물 주는 주기: {{ record.water }}시간 / 설정 주기: {{ info.water }}시간</p>
+        <p>물 주는 주기: {{ record.water }}시간 / 설정 주기: {{ info.target_water }}시간</p>
       </div>
 
       <!-- 현재 생장률 -->
       <div class="control-item">
         <img src="{{ url_for('static', filename='images/icon_images/growth.png') }}" alt="성장" class="icon">
-        <p>현재 성장: {{ record.growth }}일 / 목표 성장: {{ info.growth }}일</p>
+        <p>현재 성장: {{ record.growth }}일 / 목표 성장: {{ info.target_growth }}일</p>
       </div>
     </section>
+
     <section class="error-panel">
       <h3>오류창</h3>
       <div class="error-log">[오류 내용 출력 영역]</div>

@@ -37,16 +37,17 @@ def dashboard():
     """)
     records = cur.fetchall()
 
-    # 날짜 포맷 처리
     for row in records:
         row['datetime'] = row['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
 
-    # 사용자 목록
     cur.execute("SELECT * FROM users ORDER BY id ASC")
     users = cur.fetchall()
 
-    # 작물 목록
-    cur.execute("SELECT id, crop, temp, humidity, soil, light, water, growth FROM crop_info ORDER BY crop ASC")
+    cur.execute("""
+        SELECT id, crop, target_temp, target_humi, target_soil,
+               target_light, target_water, target_growth
+        FROM crop_info ORDER BY crop ASC
+    """)
     crops = cur.fetchall()
 
     cur.close()
@@ -68,7 +69,7 @@ def add_crop():
     if request.method == 'POST':
         crop = request.form['crop']
         temp = request.form['temp']
-        humidity = request.form['humidity']
+        humi = request.form['humi']
         soil = request.form['soil']
         light = request.form['light']
         water = request.form['water']
@@ -83,9 +84,13 @@ def add_crop():
 
         cur = get_db().connection.cursor()
         cur.execute("""
-            INSERT INTO crop_info (crop, temp, humidity, soil, light, water, growth, description, image)
+            INSERT INTO crop_info (
+                crop, target_temp, target_humi, target_soil,
+                target_light, target_water, target_growth,
+                description, image
+            )
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (crop, temp, humidity, soil, light, water, growth, description, filename))
+        """, (crop, temp, humi, soil, light, water, growth, description, filename))
         get_db().connection.commit()
         cur.close()
 
@@ -112,7 +117,7 @@ def edit_crop(crop_id):
     if request.method == 'POST':
         crop = request.form['crop']
         temp = request.form['temp']
-        humidity = request.form['humidity']
+        humi = request.form['humi']
         soil = request.form['soil']
         light = request.form['light']
         water = request.form['water']
@@ -121,10 +126,16 @@ def edit_crop(crop_id):
 
         cur.execute("""
             UPDATE crop_info
-            SET crop = %s, temp = %s, humidity = %s, soil = %s, light = %s,
-                water = %s, growth = %s, description = %s
+            SET crop = %s,
+                target_temp = %s,
+                target_humi = %s,
+                target_soil = %s,
+                target_light = %s,
+                target_water = %s,
+                target_growth = %s,
+                description = %s
             WHERE id = %s
-        """, (crop, temp, humidity, soil, light, water, growth, description, crop_id))
+        """, (crop, temp, humi, soil, light, water, growth, description, crop_id))
         get_db().connection.commit()
         cur.close()
 

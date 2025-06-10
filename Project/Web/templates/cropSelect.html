@@ -5,9 +5,10 @@
   <title>작물 선택</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/cropSelect.css') }}">
-  {% include "header.html" %}
 </head>
 <body>
+  {% include "header.html" %}
+
   <main class="select-container">
     <h2>작물을 선택해주세요</h2>
 
@@ -46,13 +47,14 @@
         </div>
         <div class="plant-details">
           <h3 class="plant-name">{{ selected_info.crop }}</h3>
-          <p>온도: {{ selected_info.temp }}℃</p>
-          <p>습도: {{ selected_info.humidity }}%</p>
-          <p>토양 수분: {{ selected_info.soil }}</p>
-          <p>빛 주는 주기: {{ selected_info.light }}시간</p>
-          <p>물 주는 주기: {{ selected_info.water }}시간</p>
-          <p>자라는 시간: {{ selected_info.growth }}일</p>
+          <p>온도: {{ selected_info.target_temp }}℃</p>
+          <p>습도: {{ selected_info.target_humi }}%</p>
+          <p>토양 수분: {{ selected_info.target_soil }}</p>
+          <p>빛 주는 주기: {{ selected_info.target_light }}시간</p>
+          <p>물 주는 주기: {{ selected_info.target_water }}시간</p>
+          <p>자라는 시간: {{ selected_info.target_growth }}일</p>
           <p class="plant-desc">{{ selected_info.description or "이 작물은 햇빛과 적절한 수분을 필요로 합니다." }}</p>
+
           <div class="button-wrapper">
             <form action="{{ url_for('crop.confirm_crop') }}" method="get" class="confirm-form">
               <input type="hidden" name="crop" value="{{ selected_info.crop }}">

@@ -1,28 +1,14 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <title>수동 제어</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_control.css') }}">
-</head>
-<body>
-  <div class="manual-control-box">
-    <h2>수동 제어</h2>
-    <form method="post" class="manual-control-form">
-      {% set controls = [
-        ('water_pump', '💧 워터펌프'),
-        ('heat_lamp', '🔥 열전구'),
-        ('fan', '🌬️ 팬'),
-        ('led', '💡 LED')
-      ] %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_control.css') }}">
 
-      {% for device, label in controls %}
-      <div class="control-row">
-        <button type="submit" name="device" value="{{ device }}_on">{{ label }} ON</button>
-        <button type="submit" name="device" value="{{ device }}_off">{{ label }} OFF</button>
-      </div>
-      {% endfor %}
-    </form>
-  </div>
-</body>
-</html>
+<div class="control-container">
+  <h2>장치 제어</h2>
+
+  <form method="post" class="device-control-form">
+    <div class="device-grid">
+      <button type="submit" name="device" value="펌프" class="device-btn">펌프 작동</button>
+      <button type="submit" name="device" value="히트램프" class="device-btn">히트램프 작동</button>
+      <button type="submit" name="device" value="팬" class="device-btn">팬 작동</button>
+      <button type="submit" name="device" value="LED" class="device-btn">LED 작동</button>
+    </div>
+  </form>
+</div>

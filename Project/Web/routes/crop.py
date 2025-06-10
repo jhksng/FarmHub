@@ -40,7 +40,7 @@ def select_crop():
         return redirect('/cropSelect')
 
     cur = get_db().connection.cursor()
-    cur.execute("UPDATE users SET selected_crop = %s WHERE id = %s", (crop_name, user_id))
+    cur.execute("UPDATE users SET selected_crop = %s, selected_time = NOW() WHERE id = %s", (crop_name, user_id))
     get_db().connection.commit()
     cur.close()
 
@@ -51,7 +51,7 @@ def custom_crop():
     user_id = session.get('user_id')
     crop_name = request.form['crop']
     temp = request.form['temp']
-    humidity = request.form['humidity']
+    humi = request.form['humi']
     soil = request.form['soil']
     light = request.form['light']
     water = request.form['water']
@@ -64,16 +64,18 @@ def custom_crop():
     if existing:
         cur.execute("""
             UPDATE crop_info
-            SET temp=%s, humidity=%s, soil=%s, light=%s, water=%s, growth=%s
+            SET target_temp=%s, target_humi=%s, target_soil=%s,
+                target_light=%s, target_water=%s, target_growth=%s
             WHERE crop=%s
-        """, (temp, humidity, soil, light, water, growth, crop_name))
+        """, (temp, humi, soil, light, water, growth, crop_name))
     else:
         cur.execute("""
-            INSERT INTO crop_info (crop, temp, humidity, soil, light, water, growth)
+            INSERT INTO crop_info (crop, target_temp, target_humi, target_soil,
+                                   target_light, target_water, target_growth)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (crop_name, temp, humidity, soil, light, water, growth))
+        """, (crop_name, temp, humi, soil, light, water, growth))
 
-    cur.execute("UPDATE users SET selected_crop = %s WHERE id = %s", (crop_name, user_id))
+    cur.execute("UPDATE users SET selected_crop = %s, selected_time = NOW() WHERE id = %s", (crop_name, user_id))
     get_db().connection.commit()
     cur.close()
 

@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
 
+<!-- 센서 로그 -->
 <section class="dashboard-section">
   <h2>센서 로그 데이터</h2>
   <table class="dashboard-table">
@@ -32,7 +33,7 @@
   </table>
 </section>
 
-
+<!-- 사용자 목록 -->
 <section class="dashboard-section">
   <h2>사용자 목록</h2>
   <table class="dashboard-table">
@@ -51,7 +52,7 @@
         <td>{{ user.id }}</td>
         <td>{{ user.username }}</td>
         <td>{{ user.selected_crop }}</td>
-        <td>{{ user.selected_time}}</td>
+        <td>{{ user.selected_time }}</td>
         <td>
           <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="post">
             <button type="submit" class="delete-btn">삭제</button>
@@ -63,6 +64,7 @@
   </table>
 </section>
 
+<!-- 등록된 작물 -->
 <section class="dashboard-section">
   <h2>등록된 작물</h2>
   <table class="dashboard-table">
@@ -82,12 +84,12 @@
       {% for crop in crops %}
       <tr>
         <td>{{ crop.crop }}</td>
-        <td>{{ crop.temp }}</td>
-        <td>{{ crop.humidity }}</td>
-        <td>{{ crop.soil }}</td>
-        <td>{{ crop.light }}</td>
-        <td>{{ crop.water }}</td>
-        <td>{{ crop.growth }}</td>
+        <td>{{ crop.target_temp }}</td>
+        <td>{{ crop.target_humi }}</td>
+        <td>{{ crop.target_soil }}</td>
+        <td>{{ crop.target_light }}</td>
+        <td>{{ crop.target_water }}</td>
+        <td>{{ crop.target_growth }}</td>
         <td class="action-cell">
           <a href="{{ url_for('admin.edit_crop', crop_id=crop.id) }}" class="edit-btn">편집</a>
           <form action="{{ url_for('admin.delete_crop', crop_id=crop.id) }}" method="post">

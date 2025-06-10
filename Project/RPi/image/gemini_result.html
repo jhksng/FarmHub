@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 분석 결과</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>🔬 AI 분석 결과</h1>
+    <div class="card result-container">
+        <div class="result-image">
+            <h3>분석한 사진: {{ image_file }}</h3>
+            <img src="{{ url_for('serve_photo', filename=image_file) }}" alt="{{ image_file }}">
+        </div>
+        <div class="result-text">
+            <h3>분석 내용</h3>
+            <pre>{{ result_text }}</pre>
+        </div>
+    </div>
+    <div class="card-nav">
+        <a href="{{ url_for('gallery') }}">&laquo; 갤러리로 돌아가기</a>
+    </div>
+</div>
+</body>
+</html>

@@ -38,3 +38,19 @@ CREATE TABLE sensor_status (
     ptc INT,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+==========================================
+
+-- 1. 새로운 테이블 생성
+CREATE TABLE control_state (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    light_on_seconds_acc INT DEFAULT 0,
+    light_last_update_time DATETIME NULL
+);
+
+-- 2. 제어 상태를 저장할 초기 데이터 1줄 추가
+INSERT INTO control_state (id, light_on_seconds_acc, light_last_update_time) VALUES (1, 0, NULL);
+
+
+

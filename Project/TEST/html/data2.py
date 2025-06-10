@@ -6,7 +6,7 @@ from datetime import datetime
 import board
 import adafruit_sht31d
 
-# I2C 및 온습도 센서 초기화
+# I2C 및 센서 초기화
 i2c = board.I2C()
 sensor = adafruit_sht31d.SHT31D(i2c, address=0x44)
 
@@ -14,7 +14,7 @@ sensor = adafruit_sht31d.SHT31D(i2c, address=0x44)
 arduino = serial.Serial('/dev/ttyACM0', 9600)
 time.sleep(2)
 
-# 작물 선택 함수
+# 선택된 작물 이름 가져오기
 def get_selected_crop():
     try:
         db = mysql.connector.connect(
@@ -44,14 +44,14 @@ def get_selected_crop():
         except:
             pass
 
-# 온습도 측정
+# 온도 습도 읽기
 def getTemp(sensor):
     return float(sensor.temperature)
 
 def getHumi(sensor):
     return float(sensor.relative_humidity)
 
-# 루프 시작
+# 센서 루프
 try:
     while True:
         selected_crop = get_selected_crop()
@@ -60,15 +60,14 @@ try:
             time.sleep(5)
             continue
 
-        # 데이터를 담을 리스트
-        soil_data = []
-        water_data = []
-        temp_data = []
-        humi_data = []
+        soil_values = []
+        water_values = []
+        temp_values = []
+        humi_values = []
 
-        print(f"🌱 '{selected_crop}' 작물의 센서 데이터를 수집합니다...")
+        print(f"🌱 '{selected_crop}' 작물의 센서 데이터를 1분간 수집합니다...")
 
-        for i in range(6):  # 10초 간격, 총 1분
+        for i in range(6):  # 10초마다 6번 = 1분
             if arduino.in_waiting > 0:
                 try:
                     data = arduino.readline().decode('utf-8').strip()
@@ -83,10 +82,10 @@ try:
                     temp = round(getTemp(sensor), 2)
                     humi = round(getHumi(sensor), 2)
 
-                    soil_data.append(soil)
-                    water_data.append(water)
-                    temp_data.append(temp)
-                    humi_data.append(humi)
+                    soil_values.append(soil)
+                    water_values.append(water)
+                    temp_values.append(temp)
+                    humi_values.append(humi)
 
                     print(f"📥 {i+1}/6 수집: Soil={soil}, Water={water}, Temp={temp}, Humi={humi}")
 
@@ -95,12 +94,11 @@ try:
 
             time.sleep(10)
 
-        # 평균 계산
-        if soil_data:
-            avg_soil = round(sum(soil_data) / len(soil_data), 2)
-            avg_water = round(sum(water_data) / len(water_data), 2)
-            avg_temp = round(sum(temp_data) / len(temp_data), 2)
-            avg_humi = round(sum(humi_data) / len(humi_data), 2)
+        if soil_values:
+            avg_soil = round(sum(soil_values) / len(soil_values), 2)
+            avg_water = round(sum(water_values) / len(water_values), 2)
+            avg_temp = round(sum(temp_values) / len(temp_values), 2)
+            avg_humi = round(sum(humi_values) / len(humi_values), 2)
             timestamp = datetime.now()
 
             try:
@@ -124,7 +122,6 @@ try:
 
             except Exception as e:
                 print(f"❌ DB 저장 오류: {e}")
-
         else:
             print("⚠️ 수집된 센서 데이터가 없습니다. 다시 시도합니다.")
 

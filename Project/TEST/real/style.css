@@ -1,0 +1,118 @@
+/* 기본 스타일 초기화 */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    height: 100%;
+}
+
+/* --- 헤더 (layout.html) 스타일 --- */
+.main-header {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 0 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+    position: fixed;
+    width: 90%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.main-header .logo a {
+    text-decoration: none;
+    color: #2c5d43;
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.main-header .main-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.main-header .main-nav li {
+    margin-left: 30px;
+}
+
+.main-header .main-nav a {
+    text-decoration: none;
+    color: #555;
+    font-size: 1.1em;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.main-header .main-nav a:hover,
+.main-header .main-nav a.active {
+    color: #2c5d43;
+}
+
+/* 메인 컨텐츠 영역 패딩 */
+.content-wrapper {
+    padding-top: 70px; /* 고정된 헤더 높이만큼 공간 확보 */
+}
+
+
+/* --- 홈페이지 (index.html) 스타일 --- */
+.home-container {
+    height: calc(100vh - 70px); /* 헤더 높이를 제외한 전체 화면 높이 */
+    background-image: url('https://placehold.co/1920x1080/2c5d43/ffffff?text=SmartFarm+Background');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative; /* 오버레이를 위한 기준점 */
+}
+
+.home-container .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* 어두운 오버레이 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.home-container .welcome-text {
+    color: white;
+    font-size: 4em;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+}
+
+.home-container .sub-text {
+    color: #e0e0e0;
+    font-size: 1.5em;
+    max-width: 600px;
+}
+
+/* --- 다른 페이지들을 위한 공용 스타일 (추가) --- */
+.page-title {
+    padding: 2rem 5%;
+    background-color: #e9ecef;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.form-container, .control-container {
+    background-color: white;
+    margin: 2rem auto;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    max-width: 800px;
+}

@@ -1,15 +1,12 @@
 from flask import Flask
-from flask_mysqldb import MySQL
 from config import Config
 from routes import register_blueprints
-from utils.db import register_mysql
+from utils import db
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# MySQL 초기화 및 등록
-mysql = MySQL(app)
-register_mysql(mysql)
+app.teardown_appcontext(db.close_db)
 
 # 블루프린트 등록
 register_blueprints(app)

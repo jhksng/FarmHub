@@ -18,7 +18,8 @@ def admin_required(f):
 @admin_bp.route('/')
 @admin_required
 def dashboard():
-    cur = get_db().connection.cursor()
+    db = get_db()
+    cur = db.cursor(dictionary=True)
 
     cur.execute("""
         SELECT 
@@ -82,7 +83,8 @@ def add_crop():
             filename = secure_filename(image.filename)
             image.save(os.path.join('static/images/crop_images', filename))
 
-        cur = get_db().connection.cursor()
+        db = get_db()
+        cur = db.cursor()
         cur.execute("""
             INSERT INTO crop_info (
                 crop, target_temp, target_humi, target_soil,
@@ -91,7 +93,7 @@ def add_crop():
             )
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (crop, temp, humi, soil, light, water, growth, description, filename))
-        get_db().connection.commit()
+        db.commit()
         cur.close()
 
         flash("작물이 성공적으로 추가되었습니다.")
@@ -102,9 +104,10 @@ def add_crop():
 @admin_bp.route('/delete_user/<int:user_id>', methods=['POST'])
 @admin_required
 def delete_user(user_id):
-    cur = get_db().connection.cursor()
+    db = get_db()
+    cur = db.cursor()
     cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
-    get_db().connection.commit()
+    db.commit()
     cur.close()
     flash("사용자가 삭제되었습니다.")
     return redirect(url_for('admin.dashboard'))
@@ -112,7 +115,8 @@ def delete_user(user_id):
 @admin_bp.route('/edit_crop/<int:crop_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_crop(crop_id):
-    cur = get_db().connection.cursor()
+    db = get_db()
+    cur = db.cursor(dictionary=True)
 
     if request.method == 'POST':
         crop = request.form['crop']
@@ -124,6 +128,7 @@ def edit_crop(crop_id):
         growth = request.form['growth']
         description = request.form['description']
 
+        cur = db.cursor()
         cur.execute("""
             UPDATE crop_info
             SET crop = %s,
@@ -136,7 +141,7 @@ def edit_crop(crop_id):
                 description = %s
             WHERE id = %s
         """, (crop, temp, humi, soil, light, water, growth, description, crop_id))
-        get_db().connection.commit()
+        db.commit()
         cur.close()
 
         flash("작물 정보가 수정되었습니다.")
@@ -155,9 +160,10 @@ def edit_crop(crop_id):
 @admin_bp.route('/delete_crop/<int:crop_id>', methods=['POST'])
 @admin_required
 def delete_crop(crop_id):
-    cur = get_db().connection.cursor()
+    db = get_db()
+    cur = db.cursor()
     cur.execute("DELETE FROM crop_info WHERE id = %s", (crop_id,))
-    get_db().connection.commit()
+    db.commit()
     cur.close()
     flash("작물이 삭제되었습니다.")
     return redirect(url_for('admin.dashboard'))

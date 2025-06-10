@@ -5,7 +5,8 @@ crop_bp = Blueprint('crop', __name__)
 
 # 유틸 함수
 def get_selected_crop(user_id):
-    cur = get_db().connection.cursor()
+    db = get_db()
+    cur = db.cursor(dictionary=True)
     cur.execute("SELECT selected_crop FROM users WHERE id = %s", (user_id,))
     row = cur.fetchone()
     cur.close()
@@ -14,7 +15,8 @@ def get_selected_crop(user_id):
 @crop_bp.route('/cropSelect', methods=['GET', 'POST'])
 def crop_select():
     user_id = session.get('user_id')
-    cur = get_db().connection.cursor()
+    db = get_db()
+    cur = db.cursor(dictionary=True)
 
     cur.execute("SELECT * FROM crop_info")
     crops = cur.fetchall()
@@ -39,9 +41,10 @@ def select_crop():
         flash("작물 선택 오류입니다.")
         return redirect('/cropSelect')
 
-    cur = get_db().connection.cursor()
+    db = get_db()
+    cur = db.cursor()
     cur.execute("UPDATE users SET selected_crop = %s, selected_time = NOW() WHERE id = %s", (crop_name, user_id))
-    get_db().connection.commit()
+    db.commit()
     cur.close()
 
     return redirect('/cropInformation')
@@ -57,7 +60,8 @@ def custom_crop():
     water = request.form['water']
     growth = request.form['growth']
 
-    cur = get_db().connection.cursor()
+    db = get_db()
+    cur = db.cursor()
     cur.execute("SELECT id FROM crop_info WHERE crop = %s", (crop_name,))
     existing = cur.fetchone()
 
@@ -76,7 +80,7 @@ def custom_crop():
         """, (crop_name, temp, humi, soil, light, water, growth))
 
     cur.execute("UPDATE users SET selected_crop = %s, selected_time = NOW() WHERE id = %s", (crop_name, user_id))
-    get_db().connection.commit()
+    db.commit()
     cur.close()
 
     return redirect('/cropInformation')
@@ -85,7 +89,8 @@ def custom_crop():
 def confirm_crop():
     crop_name = request.args.get('crop')
 
-    cur = get_db().connection.cursor()
+    db = get_db()
+    cur = db.cursor(dictionary=True)
     cur.execute("SELECT * FROM crop_info WHERE crop = %s", (crop_name,))
     crop = cur.fetchone()
     cur.close()
@@ -99,7 +104,8 @@ def confirm_crop():
 @crop_bp.route('/cropInformation')
 def crop_information():
     user_id = session.get('user_id')
-    cur = get_db().connection.cursor()
+    db = get_db()
+    cur = db.cursor(dictionary=True)
 
     cur.execute("SELECT selected_crop FROM users WHERE id = %s", (user_id,))
     row = cur.fetchone()

@@ -9,7 +9,8 @@ def signin():
         username = request.form['username']
         password = request.form['password']
 
-        cur = get_db().connection.cursor()
+        db = get_db()
+        cur = db.cursor(dictionary=True)
         cur.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
         user = cur.fetchone()
         cur.close()
@@ -31,14 +32,16 @@ def signup():
         username = request.form['username']
         password = request.form['password']
 
-        cur = get_db().connection.cursor()
+        db = get_db()
+        cur = db.cursor(dictionary=True)
         cur.execute("SELECT * FROM users WHERE username = %s", (username,))
         if cur.fetchone():
             flash('이미 존재하는 사용자입니다.')
             return redirect('/signup')
 
+        cur = db.cursor()  # INSERT에는 dictionary=True 필요 없음
         cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
-        get_db().connection.commit()
+        db.commit()
         cur.close()
 
         flash('회원가입이 완료되었습니다!')

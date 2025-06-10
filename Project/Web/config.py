@@ -1,4 +1,5 @@
-# mysql 연동동
+# config.py
+
 class Config:
     SECRET_KEY = 'your_secret_key_here'
     MYSQL_HOST = 'localhost'
@@ -6,4 +7,3 @@ class Config:
     MYSQL_USER = 'root'
     MYSQL_PASSWORD = 'port#4514'
     MYSQL_DB = 'smartparm'
-    MYSQL_CURSORCLASS = 'DictCursor'

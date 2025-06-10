@@ -184,11 +184,6 @@ def control_loop():
 
         time.sleep(10)
 
-# 상태 저장 루프 (센서 상태 저장 함수가 생략되었으니 참고만)
-def insert_status_to_db(crop_name):
-    # 여기에 DB 저장 기능이 있다면 구현
-    pass
-
 def status_log_loop():
     while True:
         selected_crop = get_current_crop()

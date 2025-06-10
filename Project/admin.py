@@ -1,61 +1,179 @@
-# /routes/admin.py
-# 파일 상단에 필요한 모듈들을 추가합니다.
-from flask import Blueprint, render_template, request, flash, session, url_for, redirect, current_app
-from datetime import datetime
-import threading
+from flask import Blueprint, render_template, request, redirect, flash, session, url_for
+from utils.db import get_db
+from functools import wraps
+import os
+from werkzeug.utils import secure_filename
 
-# get_db_connection 함수를 메인 app.py에서 가져오도록 수정해야 할 수 있습니다.
-# 이 부분은 프로젝트 전체 구조에 따라 달라집니다.
-# 만약 app.py에 get_db_connection이 있다면, 여기서는 그 함수를 직접 호출해야 합니다.
-# 지금은 임시로 있다고 가정합니다.
-from ..app import get_db_connection 
+admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
-# ... 기존 admin_bp 및 다른 라우트들 ...
+# 관리자 권한 확인 데코레이터
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('username') != 'admin':
+            flash("관리자만 접근 가능합니다.")
+            return redirect('/')
+        return f(*args, **kwargs)
+    return decorated_function
 
-# ✨새로운 제어 시작/변경 페이지 라우트
-@admin_bp.route('/start', methods=['GET', 'POST'])
+# 관리자 대시보드
+@admin_bp.route('/')
 @admin_required
-def start_control_system():
-    # POST 요청일 때 (사용자가 폼을 제출했을 때)
+def dashboard():
+    db = get_db()
+    cur = db.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT 
+            ci.crop AS crop_name,
+            sl.timestamp,
+            sl.temp,
+            sl.humi,
+            sl.soil,
+            sl.water,
+            sl.light,
+            sl.growth
+        FROM sensor_log sl
+        JOIN crop_info ci ON sl.crop_id = ci.id
+        ORDER BY sl.id DESC
+        LIMIT 50
+    """)
+    records = cur.fetchall()
+
+    for row in records:
+        row['datetime'] = row['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
+
+    cur.execute("SELECT * FROM users ORDER BY id ASC")
+    users = cur.fetchall()
+
+    cur.execute("""
+        SELECT id, crop, target_temp, target_humi, target_soil,
+               target_light, target_growth
+        FROM crop_info ORDER BY crop ASC
+    """)
+    crops = cur.fetchall()
+
+    cur.close()
+    db.close()
+
+    content = render_template('admin_dashboard_content.html', records=records, users=users, crops=crops)
+    return render_template('admin.html', content=content)
+
+# 수동 제어 페이지
+@admin_bp.route('/control', methods=['GET', 'POST'])
+@admin_required
+def control():
     if request.method == 'POST':
-        crop_name = request.form['crop'].strip()
-        
-        # app.py에 있던 자동 제어 시작 로직을 그대로 가져옵니다.
-        db = get_db_connection()
-        cursor = db.cursor()
-        cursor.execute("SELECT crop FROM crop_info WHERE crop = %s", (crop_name,))
-        if not cursor.fetchone():
-            flash("오류: 유효한 작물이 아닙니다.")
-            return redirect(url_for('admin.start_control_system'))
+        device = request.form.get('device')
+        flash(f"{device} 제어 명령 전송됨")
+    return render_template('admin.html', content=render_template('admin_control.html'))
 
-        # 메인 앱의 전역 스레드 변수에 접근 (current_app 사용)
-        if current_app.current_loop_thread and current_app.current_loop_thread.is_alive():
-            current_app.stop_event.set()
-            current_app.current_loop_thread.join(timeout=5)
+# 작물 추가 페이지
+@admin_bp.route('/add_crop', methods=['GET', 'POST'])
+@admin_required
+def add_crop():
+    if request.method == 'POST':
+        crop = request.form['crop']
+        temp = request.form['temp']
+        humi = request.form['humi']
+        soil = request.form['soil']
+        light = request.form['light']
+        growth = request.form['growth']
+        description = request.form['description']
+        image = request.files['image']
 
-        now_time = datetime.now()
-        cursor.execute("UPDATE users SET selected_crop=%s, selected_time=%s LIMIT 1", (crop_name, now_time))
-        cursor.execute("UPDATE control_state SET light_on_seconds_acc=0, light_last_update_time=%s LIMIT 1", (now_time,))
+        filename = None
+        if image and image.filename != '':
+            filename = secure_filename(image.filename)
+            image.save(os.path.join('static/images/crop_images', filename))
+
+        db = get_db()
+        cur = db.cursor()
+        cur.execute("""
+            INSERT INTO crop_info (
+                crop, target_temp, target_humi, target_soil,
+                target_light, target_growth,
+                description, image
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (crop, temp, humi, soil, light, growth, description, filename))
         db.commit()
-        cursor.close()
+        cur.close()
         db.close()
-        
-        # 메인 앱의 자동 제어 함수와 전역 변수를 사용하여 새 스레드 시작
-        current_app.stop_event = threading.Event()
-        current_app.current_crop_name = crop_name
-        # start_control_loop 함수 자체도 current_app을 통해 접근해야 할 수 있습니다.
-        # 가장 좋은 방법은 start_control_loop 함수를 app.py에 두고,
-        # 이 라우트에서 스레드를 직접 생성하는 대신, 앱의 다른 함수를 호출하는 것입니다.
-        # 여기서는 단순화를 위해 직접 생성하는 것으로 가정합니다.
-        from ..app import start_control_loop # 메인 앱의 함수를 import
-        
-        new_thread = threading.Thread(target=start_control_loop, args=(crop_name, current_app.stop_event), daemon=True)
-        new_thread.start()
-        current_app.current_loop_thread = new_thread
-        
-        flash(f"{crop_name} 자동 제어를 시작합니다.")
-        return redirect(url_for('admin.control')) # 시작 후 수동 제어 페이지로 이동
 
-    # GET 요청일 때 (페이지를 처음 열었을 때)
-    content_html = render_template('admin_start_control.html')
-    return render_template('admin.html', content=content_html)
+        flash("작물이 성공적으로 추가되었습니다.")
+        return redirect(url_for('admin.dashboard'))
+
+    return render_template('admin.html', content=render_template('admin_add_crop.html'))
+
+# 사용자 삭제
+@admin_bp.route('/delete_user/<int:user_id>', methods=['POST'])
+@admin_required
+def delete_user(user_id):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+    db.commit()
+    cur.close()
+    db.close()
+    flash("사용자가 삭제되었습니다.")
+    return redirect(url_for('admin.dashboard'))
+
+# 작물 수정
+@admin_bp.route('/edit_crop/<int:crop_id>', methods=['GET', 'POST'])
+@admin_required
+def edit_crop(crop_id):
+    db = get_db()
+    cur = db.cursor(dictionary=True)
+
+    if request.method == 'POST':
+        crop = request.form['crop']
+        temp = request.form['temp']
+        humi = request.form['humi']
+        soil = request.form['soil']
+        light = request.form['light']
+        growth = request.form['growth']
+        description = request.form['description']
+
+        cur = db.cursor()
+        cur.execute("""
+            UPDATE crop_info
+            SET crop = %s,
+                target_temp = %s,
+                target_humi = %s,
+                target_soil = %s,
+                target_light = %s,
+                target_growth = %s,
+                description = %s
+            WHERE id = %s
+        """, (crop, temp, humi, soil, light, growth, description, crop_id))
+        db.commit()
+        cur.close()
+        db.close()
+
+        flash("작물 정보가 수정되었습니다.")
+        return redirect(url_for('admin.dashboard'))
+
+    cur.execute("SELECT * FROM crop_info WHERE id = %s", (crop_id,))
+    crop = cur.fetchone()
+    cur.close()
+    db.close()
+
+    if not crop:
+        flash("작물을 찾을 수 없습니다.")
+        return redirect(url_for('admin.dashboard'))
+
+    return render_template('admin.html', content=render_template('admin_edit_crop.html', crop=crop))
+
+# 작물 삭제
+@admin_bp.route('/delete_crop/<int:crop_id>', methods=['POST'])
+@admin_required
+def delete_crop(crop_id):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("DELETE FROM crop_info WHERE id = %s", (crop_id,))
+    db.commit()
+    cur.close()
+    db.close()
+    flash("작물이 삭제되었습니다.")
+    return redirect(url_for('admin.dashboard'))

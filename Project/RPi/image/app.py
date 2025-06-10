@@ -1,49 +1,107 @@
-import google.generativeai as genai
-from flask import Flask, request, render_template
-import PIL.Image
-import io
+import os
+import glob
+from datetime import datetime
+import threading
+import time
 
-# Flask 앱 생성
+import google.generativeai as genai
+import PIL.Image
+import mysql.connector
+from flask import Flask, request, render_template, send_from_directory, url_for, redirect
+
+# --- 기본 설정 ---
 app = Flask(__name__)
 
-# 여기에 발급받은 Gemini API 키를 입력하세요.
-# 보안을 위해 실제 서비스에서는 환경 변수 등을 사용하는 것이 좋습니다.
-API_KEY = ''
-genai.configure(api_key=API_KEY)
+# ▼▼▼▼▼ 여기에 실제 Gemini API 키를 입력하세요 ▼▼▼▼▼
+GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY'
+if GEMINI_API_KEY != 'YOUR_GEMINI_API_KEY':
+    genai.configure(api_key=GEMINI_API_KEY)
 
-@app.route('/', methods=['GET', 'POST'])
-def upload_and_analyze():
-    if request.method == 'POST':
-        # 1. 웹페이지에서 업로드한 이미지 파일 받기
-        if 'crop_image' not in request.files:
-            return 'No file part'
-        file = request.files['crop_image']
-        if file.filename == '':
-            return 'No selected file'
+# GPIO 라이브러리 (가상 모드 포함)
+try:
+    import RPi.GPIO as GPIO
+    GPIO_AVAILABLE = True
+except (ImportError, RuntimeError):
+    print("RPi.GPIO 라이브러리를 찾을 수 없습니다. GPIO 제어는 비활성화됩니다.")
+    GPIO_AVAILABLE = False
+    class DummyGPIO:
+        def setmode(self, mode): pass
+        def setup(self, pin, mode, initial=None): pass
+        def output(self, pin, value): print(f"DUMMY GPIO: Pin {pin} -> {value}")
+        def cleanup(self): pass
+        BCM = 11; OUT = 0; LOW = 0; HIGH = 1
+    GPIO = DummyGPIO()
 
-        if file:
-            # 2. 이미지를 Gemini가 인식할 수 있는 형태로 변환
-            img = PIL.Image.open(file.stream)
-            
-            # 3. Gemini API 호출
-            model = genai.GenerativeModel('gemini-pro-vision') # 이미지 분석이 가능한 모델
-            
-            # 💡 여기가 가장 중요한 부분! AI에게 무엇을 원하는지 명확히 지시합니다.
-            prompt_text = """
-            당신은 작물 분석 전문가입니다. 
-            이 사진 속 작물의 종류를 알려주고, 현재 성장 단계를 상세히 분석해주세요. 
-            사진을 기반으로 판단했을 때 수확이 가능한 상태인지, 
-            아니라면 대략 얼마 정도 더 기다려야 하는지 예상 시기와 함께 알려주세요.
-            """
-            
-            # 이미지와 텍스트 프롬프트를 함께 전송
-            response = model.generate_content([prompt_text, img])
-            
-            # 4. 결과 페이지에 분석 결과 전달
-            return render_template('result.html', result_text=response.text)
+# --- 상태 관리 변수 (기존 스마트팜 로직) ---
+current_crop_name = "N/A" # 현재 제어중인 작물 이름 (필요시 DB 연동)
 
-    # GET 요청 시 (첫 접속) 파일 업로드 페이지 보여주기
-    return render_template('upload.html')
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+# --- 웹 페이지 라우트 ---
+
+@app.route('/')
+def index():
+    # 메인 페이지는 갤러리 페이지로 바로 연결합니다.
+    return redirect(url_for('gallery'))
+
+@app.route('/gallery')
+def gallery():
+    # photos 디렉토리가 없으면 생성
+    if not os.path.exists('photos'):
+        os.makedirs('photos')
+        
+    # photos 디렉토리에서 이미지 파일 목록을 가져옴 (jpg, png, jpeg)
+    image_files_path = glob.glob('photos/*.jpg') + glob.glob('photos/*.png') + glob.glob('photos/*.jpeg')
+    
+    # 전체 경로에서 파일 이름만 추출하고, 최신 파일이 위로 오도록 정렬
+    image_filenames = sorted([os.path.basename(p) for p in image_files_path], reverse=True)
+    
+    return render_template('gallery.html', image_files=image_filenames, current_crop=current_crop_name)
+
+@app.route('/photos/<filename>')
+def serve_photo(filename):
+    # photos 디렉토리의 파일에 웹 브라우저가 접근할 수 있도록 해주는 경로
+    return send_from_directory('photos', filename)
+
+@app.route('/analyze/<filename>', methods=['POST'])
+def analyze_photo(filename):
+    image_path = os.path.join('photos', filename)
+
+    if GEMINI_API_KEY == 'YOUR_GEMINI_API_KEY':
+        return "오류: Gemini API 키가 설정되지 않았습니다."
+    if not os.path.exists(image_path):
+        return "오류: 분석할 이미지를 찾을 수 없습니다."
+
+    try:
+        img = PIL.Image.open(image_path)
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
+
+        # ▼▼▼▼▼▼▼▼▼▼▼ 요청하신 대로 수정한 최종 프롬프트 ▼▼▼▼▼▼▼▼▼▼▼
+        prompt_text = """
+        이 사진을 보고 아래 형식에 맞춰 딱 두 가지만 한국어로 답변해.
+        다른 모든 설명과 문장은 절대 추가하지 마.
+
+        작물 이름: [작물의 이름]
+        수확 시기: [예상되는 수확 시기 또는 상태. 예: "즉시 수확 가능", "약 3일 후", "아직 덜 익음"]
+        """
+        # ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+        response = model.generate_content([prompt_text, img])
+        
+        return render_template('gemini_result.html', result_text=response.text, image_file=filename)
+
+    except Exception as e:
+        print(f"이미지 분석 중 오류: {e}")
+        return f"이미지 분석 중 오류가 발생했습니다: {e}"
+
+
+# --- 앱 실행 ---
+if __name__ == "__main__":
+    try:
+        # photos 디렉토리가 없으면 시작할 때 생성
+        if not os.path.exists('photos'):
+            os.makedirs('photos')
+        app.run(host='0.0.0.0', port=5000, debug=False)
+    finally:
+        if GPIO_AVAILABLE:
+            print("애플리케이션 종료 시 GPIO.cleanup() 실행")
+            GPIO.cleanup()

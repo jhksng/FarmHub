@@ -2,27 +2,21 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>실시간 카메라</title>
-    <style>
-        body {
-            text-align: center;
-            font-family: sans-serif;
-            padding: 30px;
-        }
-        img {
-            max-width: 500px;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
-        }
-        p {
-            margin-top: 20px;
-            color: #555;
-        }
-    </style>
+    <title>카메라 보기</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/camera.css') }}">
 </head>
 <body>
-    <h2>실시간 카메라</h2>
-    <img src="{{ image_url }}" alt="최근 식물 사진">
-    <p>페이지 접속 시 실시간으로 촬영된 사진입니다.</p>
+    <header>
+        <h1>카메라</h1>
+        <a href="{{ url_for('main.home') }}">홈으로</a>
+    </header>
+
+    <main>
+        {% if photo_filename %}
+            <img src="{{ url_for('static', filename='photos/' ~ photo_filename) }}" alt="최근 사진" style="max-width: 100%;">
+        {% else %}
+            <p>사진이 없습니다.</p>
+        {% endif %}
+    </main>
 </body>
 </html>

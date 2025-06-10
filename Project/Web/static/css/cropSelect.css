@@ -114,7 +114,7 @@ body {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .custom-crop-form h3 {
@@ -122,19 +122,29 @@ body {
   color: #2c3e50;
 }
 
-.custom-crop-form label {
+/* 한 줄 정렬을 위한 form-row 구조 */
+.custom-crop-form .form-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-crop-form .form-row label {
+  flex: 1;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.custom-crop-form .form-row input {
+  flex: 2;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   font-size: 14px;
 }
 
-.custom-crop-form input {
-  width: 60%;
-  padding: 6px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
+/* 저장 버튼 */
 .custom-crop-form button {
   align-self: center;
   margin-top: 10px;

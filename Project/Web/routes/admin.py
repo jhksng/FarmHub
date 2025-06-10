@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
+# 관리자 권한 확인 데코레이터
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -15,6 +16,7 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# 관리자 대시보드
 @admin_bp.route('/')
 @admin_required
 def dashboard():
@@ -46,7 +48,7 @@ def dashboard():
 
     cur.execute("""
         SELECT id, crop, target_temp, target_humi, target_soil,
-               target_light, target_water, target_growth
+               target_light, target_growth
         FROM crop_info ORDER BY crop ASC
     """)
     crops = cur.fetchall()
@@ -56,6 +58,7 @@ def dashboard():
     content = render_template('admin_dashboard_content.html', records=records, users=users, crops=crops)
     return render_template('admin.html', content=content)
 
+# 수동 제어 페이지
 @admin_bp.route('/control', methods=['GET', 'POST'])
 @admin_required
 def control():
@@ -64,6 +67,7 @@ def control():
         flash(f"{device} 제어 명령 전송됨")
     return render_template('admin.html', content=render_template('admin_control.html'))
 
+# 작물 추가 페이지
 @admin_bp.route('/add_crop', methods=['GET', 'POST'])
 @admin_required
 def add_crop():
@@ -73,7 +77,6 @@ def add_crop():
         humi = request.form['humi']
         soil = request.form['soil']
         light = request.form['light']
-        water = request.form['water']
         growth = request.form['growth']
         description = request.form['description']
         image = request.files['image']
@@ -88,11 +91,11 @@ def add_crop():
         cur.execute("""
             INSERT INTO crop_info (
                 crop, target_temp, target_humi, target_soil,
-                target_light, target_water, target_growth,
+                target_light, target_growth,
                 description, image
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (crop, temp, humi, soil, light, water, growth, description, filename))
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (crop, temp, humi, soil, light, growth, description, filename))
         db.commit()
         cur.close()
 
@@ -101,6 +104,7 @@ def add_crop():
 
     return render_template('admin.html', content=render_template('admin_add_crop.html'))
 
+# 사용자 삭제
 @admin_bp.route('/delete_user/<int:user_id>', methods=['POST'])
 @admin_required
 def delete_user(user_id):
@@ -112,6 +116,7 @@ def delete_user(user_id):
     flash("사용자가 삭제되었습니다.")
     return redirect(url_for('admin.dashboard'))
 
+# 작물 수정
 @admin_bp.route('/edit_crop/<int:crop_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_crop(crop_id):
@@ -124,7 +129,6 @@ def edit_crop(crop_id):
         humi = request.form['humi']
         soil = request.form['soil']
         light = request.form['light']
-        water = request.form['water']
         growth = request.form['growth']
         description = request.form['description']
 
@@ -136,11 +140,10 @@ def edit_crop(crop_id):
                 target_humi = %s,
                 target_soil = %s,
                 target_light = %s,
-                target_water = %s,
                 target_growth = %s,
                 description = %s
             WHERE id = %s
-        """, (crop, temp, humi, soil, light, water, growth, description, crop_id))
+        """, (crop, temp, humi, soil, light, growth, description, crop_id))
         db.commit()
         cur.close()
 
@@ -157,6 +160,7 @@ def edit_crop(crop_id):
 
     return render_template('admin.html', content=render_template('admin_edit_crop.html', crop=crop))
 
+# 작물 삭제
 @admin_bp.route('/delete_crop/<int:crop_id>', methods=['POST'])
 @admin_required
 def delete_crop(crop_id):

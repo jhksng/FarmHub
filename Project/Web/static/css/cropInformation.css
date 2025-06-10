@@ -1,5 +1,6 @@
 body {
-  overflow: hidden; /* 스크롤 제거 */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* 전체 컨테이너를 수직 정렬 */
@@ -69,4 +70,10 @@ body {
   padding: 4px;
   color: #c0392b;
   overflow-y: auto;
+}
+
+@media (max-width: 600px) {
+  .status-panel {
+    grid-template-columns: 1fr;
+  }
 }

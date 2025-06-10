@@ -5,35 +5,34 @@
   <title>작물 선택 확인</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/confirm.css') }}">
-  {% include "header.html" %}
 </head>
 <body>
+  {% include "header.html" %}
 
-<h2>작물 선택 확인</h2>
+  <h2>작물 선택 확인</h2>
 
-<div class="confirm-box">
-  <p>정말 <strong>{{ crop.crop }}</strong>을(를) 선택하시겠습니까?</p>
-  <p>지금 키우고 있는 식물의 시스템 데이터가 초기화 됩니다.</p>
-  <ul>
-    <li>필요한 온도: {{ crop.target_temp }}℃</li>
-    <li>필요한 습도: {{ crop.target_humi }}%</li>
-    <li>필요한 토양 수분: {{ crop.target_soil }}</li>
-    <li>빛 주는 주기: {{ crop.target_light }}시간</li>
-    <li>물 주는 주기: {{ crop.target_water }}시간</li>
-    <li>다 자라는 시간: {{ crop.target_growth }}일</li>
-  </ul>
+  <div class="confirm-box">
+    <p>정말 <strong>{{ crop.crop }}</strong>을(를) 선택하시겠습니까?</p>
+    <p>지금 키우고 있는 식물의 시스템 데이터가 초기화 됩니다.</p>
+    <ul>
+      <li>필요한 온도: {{ crop.target_temp }}℃</li>
+      <li>필요한 습도: {{ crop.target_humi }}%</li>
+      <li>필요한 토양 수분: {{ crop.target_soil }}</li>
+      <li>빛 주는 주기: {{ crop.target_light }}시간</li>
+      <li>다 자라는 시간: {{ crop.target_growth }}일</li>
+    </ul>
 
-  <div class="confirm-buttons">
-    <form method="POST" action="{{ url_for('crop.select_crop') }}">
-      <input type="hidden" name="crop_name" value="{{ crop.crop }}">
-      <button type="submit">예</button>
-    </form>
+    <div class="confirm-buttons">
+      <form method="POST" action="{{ url_for('crop.select_crop') }}">
+        <input type="hidden" name="crop_name" value="{{ crop.crop }}">
+        <button type="submit">예</button>
+      </form>
 
-    <a href="{{ url_for('crop.crop_select') }}">
-      <button type="button">아니오</button>
-    </a>
+      <a href="{{ url_for('crop.crop_select') }}">
+        <button type="button">아니오</button>
+      </a>
+    </div>
   </div>
-</div>
 
 </body>
 </html>

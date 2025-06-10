@@ -10,7 +10,7 @@
         <th>온도 (℃)</th>
         <th>습도 (%)</th>
         <th>토양 수분</th>
-        <th>물 주기 (시간)</th>
+        <th>물 수위</th>
         <th>광량 (초)</th>
         <th>생장 일수</th>
         <th>기록 시간</th>
@@ -75,7 +75,6 @@
         <th>습도</th>
         <th>토양 수분</th>
         <th>광량</th>
-        <th>급수</th>
         <th>성장</th>
         <th>작업</th>
       </tr>
@@ -88,7 +87,6 @@
         <td>{{ crop.target_humi }}</td>
         <td>{{ crop.target_soil }}</td>
         <td>{{ crop.target_light }}</td>
-        <td>{{ crop.target_water }}</td>
         <td>{{ crop.target_growth }}</td>
         <td class="action-cell">
           <a href="{{ url_for('admin.edit_crop', crop_id=crop.id) }}" class="edit-btn">편집</a>

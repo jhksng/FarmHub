@@ -1,16 +1,15 @@
-<!-- 필요 없어진 삭제된 데이터 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>데이터기록</title>
+    <title>센서 데이터 기록</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/datarecord.css') }}">
 </head>
 <body>
 
     {% include 'header.html' %}
 
-    <h2>데이터 베이스 기록</h2>
+    <h2>센서 데이터 기록</h2>
 
     <table>
         <thead>
@@ -18,10 +17,12 @@
                 <th>기록 번호</th>
                 <th>작물</th>
                 <th>날짜/시간</th>
-                <th>온도</th>
-                <th>습도</th>
-                <th>빛(켜진시간)</th>
-                <th>성장률</th>
+                <th>온도 (℃)</th>
+                <th>습도 (%)</th>
+                <th>토양 수분</th>
+                <th>물 수위</th>
+                <th>광량 (초)</th>
+                <th>성장 일수</th>
             </tr>
         </thead>
         <tbody>
@@ -30,10 +31,12 @@
                 <td>{{ loop.index }}</td>
                 <td>{{ record.crop_name }}</td>
                 <td>{{ record.datetime }}</td>
-                <td>{{ record.temp }}도</td>
-                <td>{{ record.humidity }}%</td>
-                <td>{{ record.light_str }}</td>
-                <td>{{ record.growth }}일</td>
+                <td>{{ record.temp }}</td>
+                <td>{{ record.humi }}</td>
+                <td>{{ record.soil }}</td>
+                <td>{{ record.water }}</td>
+                <td>{{ record.light }}</td>
+                <td>{{ record.growth }}</td>
             </tr>
             {% endfor %}
         </tbody>

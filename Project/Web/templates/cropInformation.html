@@ -5,9 +5,10 @@
   <title>작물 상태</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/cropInformation.css') }}">
-  {% include "header.html" %}
 </head>
 <body>
+  {% include "header.html" %}
+
   <main class="info-container">
     <section class="status-panel">
       <h2>{{ info.crop }}</h2>
@@ -27,7 +28,7 @@
       <!-- 토양 수분 -->
       <div class="control-item">
         <img src="{{ url_for('static', filename='images/icon_images/soil.png') }}" alt="토양 수분" class="icon">
-        <p>현재 토양 수분 {{ record.soil }} / 적정 토양 수분 {{ info.target_soil }}</p>
+        <p>현재 토양 수분 {{ record.soil }} / 적정 {{ info.target_soil }}</p>
       </div>
 
       <!-- 광량 -->
@@ -36,10 +37,10 @@
         <p>누적 광량: {{ record.light }}초 / 목표: {{ info.target_light }}시간</p>
       </div>
 
-      <!-- 물 주는 주기 -->
+      <!-- 물 수위 -->
       <div class="control-item">
-        <img src="{{ url_for('static', filename='images/icon_images/water.png') }}" alt="물주기" class="icon">
-        <p>물 주는 주기: {{ record.water }}시간 / 설정 주기: {{ info.target_water }}시간</p>
+        <img src="{{ url_for('static', filename='images/icon_images/water.png') }}" alt="물 수위" class="icon">
+        <p>물 수위: {{ record.water }}</p>
       </div>
 
       <!-- 현재 생장률 -->

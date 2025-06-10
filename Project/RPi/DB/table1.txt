@@ -5,7 +5,15 @@ CREATE TABLE sensor_log (
   temp FLOAT NOT NULL,
   humi FLOAT NOT NULL,
   timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  crop varchar(20)
+  crop varchar(50)
+);
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username varchar(20) NOT NULL UNIQUE,
+  password varchar(30) NOT NULL,
+  selected_crop(100) default null,
+  selected_time datetime default current_timestamp
 );
 
 CREATE TABLE crop_info (
@@ -17,11 +25,8 @@ CREATE TABLE crop_info (
     target_soil FLOAT,                         -- 토양 습도
     target_growth FLOAT,                      -- 자라는 데 걸리는 시간
     description TEXT,                  -- 설명
-    image VARCHAR(255),                 -- 이미지 파일 이름
-    selected TINYINT DEFAULT 0;
+    image VARCHAR(255)              -- 이미지 파일 이름
 );
-
-
 
 CREATE TABLE sensor_status (
     id INT AUTO_INCREMENT PRIMARY KEY,

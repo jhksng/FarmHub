@@ -1,3 +1,0 @@
-chmod +x /home/pi/web/auto_run.py
-
-sudo nano /etc/systemd/system/smartfarm.service

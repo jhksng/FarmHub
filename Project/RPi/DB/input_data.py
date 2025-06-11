@@ -193,16 +193,11 @@ def collect_and_save_sensor_data():
 
     for i in range(6): # 10초마다 6번 = 1분
         try:
-            # --- 아두이노로부터 데이터 수신 로직 강화 ---
-            # 1. 시리얼 입력 버퍼를 완전히 비웁니다.
             arduino.reset_input_buffer()
-            # 2. 아두이노가 데이터를 보내기 시작할 시간을 잠시 기다립니다.
-            time.sleep(0.5) # 아두이노가 0.1초마다 보내면 0.5초 대기하면 5개 정도 쌓일 수 있음
-
-            # 3. 버퍼에 데이터가 실제로 있는지 확인 후 읽기 시도
+            time.sleep(0.5) 
             if arduino.in_waiting > 0:
                 data = arduino.readline().decode('utf-8').strip()
-                print(f"DEBUG: {i+1}/6 수신 데이터: '{data}'") # 디버그용 출력 강화
+                print(f"DEBUG: {i+1}/6 수신 데이터: '{data}'")
                 sys.stdout.flush()
 
                 values = data.split(",")
@@ -220,16 +215,16 @@ def collect_and_save_sensor_data():
                         temp_values.append(temp)
                         humi_values.append(humi)
 
-                        print(f"📥 {i+1}/6 수집 성공: Soil={soil:.2f}, Water={water:.2f}, Temp={temp:.2f}, Humi={humi:.2f}")
+                        print(f" {i+1}/6 수집 성공: Soil={soil:.2f}, Water={water:.2f}, Temp={temp:.2f}, Humi={humi:.2f}")
                         sys.stdout.flush()
                     except ValueError:
-                        print(f"🚫 {i+1}/6 데이터 변환 오류: '{data}' - 숫자 형식 확인 필요.")
+                        print(f" {i+1}/6 데이터 변환 오류: '{data}' - 숫자 형식 확인 필요.")
                         sys.stdout.flush()
                 else:
-                    print(f"🚫 {i+1}/6 잘못된 데이터 형식: '{data}' (기대: soil,water)")
+                    print(f" {i+1}/6 잘못된 데이터 형식: '{data}' (기대: soil,water)")
                     sys.stdout.flush()
             else:
-                print(f"⚠️ {i+1}/6 수집: 아두이노 데이터 수신 대기 중... (버퍼 비어있음)")
+                print(f" {i+1}/6 수집: 아두이노 데이터 수신 대기 중... (버퍼 비어있음)")
                 sys.stdout.flush()
 
         except serial.SerialTimeoutException:

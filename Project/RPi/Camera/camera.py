@@ -29,13 +29,13 @@ def get_crop_name_from_mysql(username_to_fetch="admin"):
         if result and result[0]:
             return result[0] # selected_crop 컬럼의 값 반환
         else:
-            print(f"⚠️ 사용자 '{username_to_fetch}'의 선택된 작물이 없습니다. 'unknown'으로 처리합니다.")
+            print(f" 사용자 '{username_to_fetch}'의 선택된 작물이 없습니다. 'unknown'으로 처리합니다.")
             return "unknown"
     except mysql.connector.Error as err:
-        print(f"❌ MySQL 오류 발생 (get_crop_name_from_mysql): {err}")
+        print(f" MySQL 오류 발생 (get_crop_name_from_mysql): {err}")
         return "unknown"
     except Exception as e:
-        print(f"❌ 기타 오류 발생 (get_crop_name_from_mysql): {e}")
+        print(f" 기타 오류 발생 (get_crop_name_from_mysql): {e}")
         return "unknown"
     finally:
         if cursor:

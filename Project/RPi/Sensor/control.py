@@ -116,9 +116,8 @@ def start_control_loop(crop_name, stop_event):
                 time.sleep(10)
                 continue
 
-            # --- 생장등, 워터펌프 등 모든 자동 제어 로직 ---
+           
             if not manual_override['LED']:
-                # ... (LED 제어 로직은 여기에 그대로 존재)
                 pass
             if not manual_override['WaterPump']:
                 if sensor['soil'] < crop_settings['soil'] and (now - last_water_time).total_seconds() >= 600:

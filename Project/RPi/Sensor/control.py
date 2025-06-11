@@ -44,7 +44,6 @@ def get_db_connection():
     return mysql.connector.connect(host="localhost", user="root", password="1234", database="sensor")
 
 def load_crop_settings(crop_name):
-    # (내용 변경 없음)
     db = get_db_connection(); cursor = db.cursor()
     cursor.execute("SELECT target_temp, target_humi, target_light, target_soil FROM crop_info WHERE crop = %s", (crop_name,))
     result = cursor.fetchone()
@@ -53,7 +52,6 @@ def load_crop_settings(crop_name):
     return None
 
 def get_latest_sensor_values(crop_name):
-    # (내용 변경 없음)
     db = get_db_connection(); cursor = db.cursor()
     cursor.execute("SELECT id FROM crop_info WHERE crop = %s", (crop_name,)); crop_id_res = cursor.fetchone()
     if not crop_id_res: cursor.close(); db.close(); return None
@@ -65,7 +63,6 @@ def get_latest_sensor_values(crop_name):
     return None
 
 def control_device(name, value):
-    # (내용 변경 없음)
     pin_num = pins[name]
     if device_state[pin_num] != value:
         device_state[pin_num] = value
@@ -74,7 +71,6 @@ def control_device(name, value):
         print(f"[{datetime.now().strftime('%H:%M:%S')}] {name} 제어: {action}")
 
 def water_pump_routine():
-    # (내용 변경 없음)
     print("워터펌프 작동 시작")
     control_device('WaterPump', GPIO.LOW)
     time.sleep(10)
@@ -82,7 +78,6 @@ def water_pump_routine():
     print("워터펌프 작동 종료")
 
 def heater_routine():
-    # (내용 변경 없음)
     print("히터 작동 시작")
     control_device('PTC', GPIO.LOW)
     time.sleep(60)
@@ -180,9 +175,6 @@ def set_auto_mode(device_name):
     print(f"{device_name}을(를) 자동 모드로 전환합니다.")
     return ('', 204)
 
-# ==============================================================================
-#  DB 기반 자동 시작 시스템
-# ==============================================================================
 def auto_start_control_from_db():
     global current_loop_thread, current_crop_name, stop_event
     print("시스템 시작: DB에서 선택된 작물을 확인합니다...")

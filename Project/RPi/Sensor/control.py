@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from flask import Flask, request, render_template, render_template_string
 import mysql.connector
 
-# RPi.GPIO 라이브러리 임포트 (가상 모드 포함)
 try:
     import RPi.GPIO as GPIO
     GPIO_AVAILABLE = True
